@@ -1,0 +1,32 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.gyf.cactus">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application>
+        <activity android:name=".activity.OnePixActivity" />
+
+        <service
+            android:name=".service.JobHandlerService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service android:name=".service.HideForegroundService" />
+        <service
+            android:name=".service.LocalService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".service.RemoteService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":cactusRemoteService" />
+
+        <receiver android:name=".service.LocalService$OnePixReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_ON" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
