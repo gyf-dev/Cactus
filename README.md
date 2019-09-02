@@ -9,7 +9,11 @@
 - java用法
 
    ```java
-    Cactus.getInstance().isDebug(true).setPendingIntent(pendingIntent).addCallback(new CactusaddCallback()).register(this)
+    Cactus.getInstance()
+          .isDebug(true)
+          .setPendingIntent(pendingIntent)
+          .addCallback(new CactusaddCallback())
+          .register(this)
    ```
 - kotlin用法
  
@@ -18,7 +22,15 @@
        setPendingIntent(pendingIntent)
        setMusicId(R.raw.main)
        isDebug(true)
-       addCallback(this@App)
+       addCallback(object : CactusCallback {
+              override fun doWork() {
+                           
+              }
+       
+              override fun onStop() {
+                          
+              }
+       })
     }
    ```
 
