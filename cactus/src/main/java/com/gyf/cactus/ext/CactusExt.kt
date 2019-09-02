@@ -25,6 +25,9 @@ import java.lang.ref.WeakReference
  * @date 2019-08-28 18:23
  */
 
+/**
+ * 用以保存一像素Activity
+ */
 private var mWeakReference: WeakReference<Activity>? = null
 
 /**

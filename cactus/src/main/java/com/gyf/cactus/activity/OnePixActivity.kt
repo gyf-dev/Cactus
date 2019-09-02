@@ -10,6 +10,7 @@ import com.gyf.cactus.ext.isScreenOn
 import com.gyf.cactus.ext.setOnePix
 
 /**
+ * 一像素界面
  * @author geyifeng
  * @date 2019-08-29 13:29
  */
