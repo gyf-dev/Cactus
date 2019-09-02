@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
 import com.gyf.cactus.ext.isMain
+import com.gyf.cactus.ext.register
 import com.gyf.cactus.ext.registerCactus
 import com.gyf.cactus.ext.registerJobCactus
 
@@ -34,6 +35,7 @@ class Cactus private constructor() {
         internal const val CACTUS_CONFIG = "cactusConfig"
         internal const val CACTUS_NOTIFICATION_CONFIG = "notificationConfig"
         internal val CALLBACKS = arrayListOf<CactusCallback>()
+        internal var mCactusConfig = CactusConfig()
         @JvmStatic
         val instance by lazy { Cactus() }
     }
@@ -203,13 +205,8 @@ class Cactus private constructor() {
                 mNotificationConfig,
                 mDefaultConfig
             )
-            if (isMain) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    registerJobCactus(cactusConfig)
-                } else {
-                    registerCactus(cactusConfig)
-                }
-            }
+            mCactusConfig = cactusConfig
+            context.register(cactusConfig)
         }
     }
 }

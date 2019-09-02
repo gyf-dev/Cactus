@@ -6,8 +6,13 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.os.Handler
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.CactusConfig
 import com.gyf.cactus.NotificationConfig
@@ -16,7 +21,9 @@ import com.gyf.cactus.service.CactusJobService
 import com.gyf.cactus.service.HideForegroundService
 import com.gyf.cactus.service.LocalService
 import com.gyf.cactus.service.RemoteService
+import com.gyf.cactus.workmanager.CactusWorker
 import java.lang.ref.WeakReference
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -39,7 +46,22 @@ fun Context.cactus(block: Cactus.() -> Unit) =
     Cactus.instance.apply { block() }.register(this)
 
 /**
- * 注册服务
+ * 注册Cactus服务
+ * @receiver Context
+ * @param cactusConfig CactusConfig
+ */
+internal fun Context.register(cactusConfig: CactusConfig) {
+    if (isMain) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            registerJobCactus(cactusConfig)
+        } else {
+            registerCactus(cactusConfig)
+        }
+    }
+}
+
+/**
+ * 最终都将调用此方法，注册Cactus服务
  * @receiver Context
  * @param cactusConfig CactusConfig
  */
@@ -51,6 +73,7 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     } else {
         startService(intent)
     }
+    Handler().postDelayed({ registerWorker() }, 5000)
 }
 
 /**
@@ -66,6 +89,20 @@ internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
     } else {
         startService(intent)
     }
+}
+
+/**
+ * 开启WorkManager
+ * @receiver Context
+ */
+internal fun Context.registerWorker() {
+    val constraintsBuilder = Constraints.Builder()
+    constraintsBuilder.setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+    val workRequest = PeriodicWorkRequest.Builder(CactusWorker::class.java, 15, TimeUnit.SECONDS)
+        .setConstraints(constraintsBuilder.build())
+        .addTag(Cactus.CACTUS_TAG)
+        .build()
+    WorkManager.getInstance(this).enqueue(workRequest)
 }
 
 /**

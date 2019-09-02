@@ -6,6 +6,7 @@ import android.media.MediaPlayer
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.CactusConfig
 import com.gyf.cactus.ICactusInterface
@@ -98,6 +99,7 @@ class LocalService : Service() {
      */
     private fun onStop() {
         log("LocalService is stop!")
+        WorkManager.getInstance(this).cancelAllWorkByTag(Cactus.CACTUS_TAG)
         sendBroadcast(Intent(Cactus.CACTUS_STOP))
         if (Cactus.CALLBACKS.isNotEmpty()) {
             Cactus.CALLBACKS.forEach {
