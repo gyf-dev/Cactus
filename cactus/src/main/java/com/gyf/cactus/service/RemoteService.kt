@@ -65,7 +65,7 @@ class RemoteService : Service() {
     }
 
     private fun log(msg: String) {
-        if (mCactusConfig.debug) {
+        if (mCactusConfig.defaultConfig.debug) {
             Log.d(Cactus.CACTUS_TAG, msg)
         }
     }

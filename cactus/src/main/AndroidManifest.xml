@@ -6,10 +6,12 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application>
-        <activity android:name=".activity.OnePixActivity" />
+        <activity
+            android:name=".activity.OnePixActivity"
+            android:theme="@style/OnePixTheme" />
 
         <service
-            android:name=".service.JobHandlerService"
+            android:name=".service.CactusJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".service.HideForegroundService" />
         <service
@@ -22,7 +24,7 @@
             android:exported="true"
             android:process=":cactusRemoteService" />
 
-        <receiver android:name=".service.LocalService$OnePixReceiver">
+        <receiver android:name=".service.LocalService$ScreenOnOffReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.SCREEN_ON" />
                 <action android:name="android.intent.action.SCREEN_OFF" />

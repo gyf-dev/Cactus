@@ -22,7 +22,7 @@ import com.gyf.cactus.ext.setNotification
  * @date 2019-08-30 13:03
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-class JobHandlerService : JobService() {
+class CactusJobService : JobService() {
 
     private var mCactusConfig = CactusConfig()
 
@@ -62,7 +62,7 @@ class JobHandlerService : JobService() {
         jobScheduler.cancel(jobId)
         val builder = JobInfo.Builder(
             jobId,
-            ComponentName(packageName, JobHandlerService::class.java.name)
+            ComponentName(packageName, CactusJobService::class.java.name)
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS) //执行的最小延迟时间

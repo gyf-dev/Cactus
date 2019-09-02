@@ -11,12 +11,12 @@ import com.gyf.cactus.Cactus
  * @author geyifeng
  * @date 2019-08-30 10:30
  */
-class CactusReceiver : BroadcastReceiver() {
+class MainReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         intent.action?.apply {
             when (this) {
                 Cactus.CACTUS_WORK, Cactus.CACTUS_STOP -> {
-                    Log.d("Cactus1", this)
+                    Log.d(App.TAG, this)
                 }
             }
         }

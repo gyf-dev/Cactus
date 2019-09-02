@@ -22,6 +22,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name=".MainReceiver">
+            <intent-filter>
+                <action android:name="com.gyf.cactus.work" />
+                <action android:name="com.gyf.cactus.stop" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -8,13 +8,15 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
-import com.gyf.cactus.NotificationConfig
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.CactusConfig
+import com.gyf.cactus.NotificationConfig
 import com.gyf.cactus.activity.OnePixActivity
+import com.gyf.cactus.service.CactusJobService
 import com.gyf.cactus.service.HideForegroundService
 import com.gyf.cactus.service.LocalService
 import com.gyf.cactus.service.RemoteService
+import java.lang.ref.WeakReference
 
 
 /**
@@ -22,6 +24,8 @@ import com.gyf.cactus.service.RemoteService
  * @author geyifeng
  * @date 2019-08-28 18:23
  */
+
+private var mWeakReference: WeakReference<Activity>? = null
 
 /**
  * kotlin里使用Cactus
@@ -38,6 +42,21 @@ fun Context.cactus(block: Cactus.() -> Unit) =
  */
 internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, LocalService::class.java)
+    intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        startForegroundService(intent)
+    } else {
+        startService(intent)
+    }
+}
+
+/**
+ * 注册JobService
+ * @receiver Context
+ * @param cactusConfig CactusConfig
+ */
+internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
+    val intent = Intent(this, CactusJobService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         startForegroundService(intent)
@@ -140,6 +159,16 @@ internal fun Service.startLocalService(
 }
 
 /**
+ * 保存一像素，方便销毁
+ * @receiver OnePixActivity
+ */
+internal fun OnePixActivity.setOnePix() {
+    if (mWeakReference == null) {
+        mWeakReference = WeakReference(this)
+    }
+}
+
+/**
  * 开启一像素界面
  * @receiver Context
  */
@@ -151,6 +180,18 @@ internal fun Context.startOnePixActivity() {
     try {
         pendingIntent.send()
     } catch (e: Exception) {
+    }
+}
+
+/**
+ * 销毁一像素
+ */
+internal fun finishOnePix() {
+    mWeakReference?.apply {
+        get()?.apply {
+            finish()
+        }
+        mWeakReference = null
     }
 }
 

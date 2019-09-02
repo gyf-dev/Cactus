@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="OnePixTheme" parent="Theme.AppCompat">
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoDisplay">false</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
+</resources>

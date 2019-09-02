@@ -2,11 +2,10 @@ package com.gyf.cactus
 
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import com.gyf.cactus.ext.isMain
 import com.gyf.cactus.ext.registerCactus
-import com.gyf.cactus.service.JobHandlerService
+import com.gyf.cactus.ext.registerJobCactus
 
 /**
  * Cactus保活方案，Cactus有两种形式处理回调事件，
@@ -22,34 +21,21 @@ class Cactus private constructor() {
      * 通知栏信息
      */
     private var mNotificationConfig = NotificationConfig()
+
     /**
-     * debug模式
+     * 默认配置信息
      */
-    private var mDebug = false
-    /**
-     * 是否可以播放音乐
-     */
-    private var mMusicEnabled = true
-    /**
-     * 音乐资源ID
-     */
-    private var mMusicId = R.raw.cactus
-    /**
-     * 播放音乐间隔时间
-     */
-    private var mRepeatInterval: Long = 0L
+    private val mDefaultConfig = DefaultConfig()
 
     companion object {
         const val CACTUS_WORK = "com.gyf.cactus.work"
         const val CACTUS_STOP = "com.gyf.cactus.stop"
-        internal const val CACTUS_TAG = "Cactus"
+        internal const val CACTUS_TAG = "cactus"
         internal const val CACTUS_CONFIG = "cactusConfig"
         internal const val CACTUS_NOTIFICATION_CONFIG = "notificationConfig"
         internal val CALLBACKS = arrayListOf<CactusCallback>()
         @JvmStatic
-        val instance by lazy {
-            Cactus()
-        }
+        val instance by lazy { Cactus() }
     }
 
     /**
@@ -57,9 +43,8 @@ class Cactus private constructor() {
      * @param notificationConfig NotificationConfig
      * @return Cactus
      */
-    fun setNotificationConfig(notificationConfig: NotificationConfig) = run {
+    fun setNotificationConfig(notificationConfig: NotificationConfig) = apply {
         mNotificationConfig = notificationConfig
-        this
     }
 
     /**
@@ -67,9 +52,8 @@ class Cactus private constructor() {
      * @param pendingIntent PendingIntent
      * @return Cactus
      */
-    fun setPendingIntent(pendingIntent: PendingIntent) = run {
+    fun setPendingIntent(pendingIntent: PendingIntent) = apply {
         mNotificationConfig.pendingIntent = pendingIntent
-        this
     }
 
     /**
@@ -77,9 +61,8 @@ class Cactus private constructor() {
      * @param hide Boolean
      * @return Cactus
      */
-    fun hideNotification(hide: Boolean) = run {
+    fun hideNotification(hide: Boolean) = apply {
         mNotificationConfig.hideNotification = hide
-        this
     }
 
     /**
@@ -87,9 +70,8 @@ class Cactus private constructor() {
      * @param serviceId Int
      * @return Cactus
      */
-    fun setServiceId(serviceId: Int) = run {
+    fun setServiceId(serviceId: Int) = apply {
         mNotificationConfig.serviceId = serviceId
-        this
     }
 
     /**
@@ -97,9 +79,8 @@ class Cactus private constructor() {
      * @param channelId String
      * @return Cactus
      */
-    fun setChannelId(channelId: String) = run {
+    fun setChannelId(channelId: String) = apply {
         mNotificationConfig.channelId = channelId
-        this
     }
 
     /**
@@ -107,9 +88,8 @@ class Cactus private constructor() {
      * @param channelName String
      * @return Cactus
      */
-    fun setChannelName(channelName: String) = run {
+    fun setChannelName(channelName: String) = apply {
         mNotificationConfig.channelName = channelName
-        this
     }
 
     /**
@@ -117,9 +97,8 @@ class Cactus private constructor() {
      * @param title String
      * @return Cactus
      */
-    fun setTitle(title: String) = run {
+    fun setTitle(title: String) = apply {
         mNotificationConfig.title = title
-        this
     }
 
     /**
@@ -127,9 +106,8 @@ class Cactus private constructor() {
      * @param content String
      * @return Cactus
      */
-    fun setContent(content: String) = run {
+    fun setContent(content: String) = apply {
         mNotificationConfig.content = content
-        this
     }
 
     /**
@@ -137,9 +115,8 @@ class Cactus private constructor() {
      * @param smallIcon Int
      * @return Cactus
      */
-    fun setSmallIcon(smallIcon: Int) = run {
+    fun setSmallIcon(smallIcon: Int) = apply {
         mNotificationConfig.smallIcon = smallIcon
-        this
     }
 
     /**
@@ -147,9 +124,8 @@ class Cactus private constructor() {
      * @param largeIcon Int
      * @return Cactus
      */
-    fun setLargeIcon(largeIcon: Int) = run {
+    fun setLargeIcon(largeIcon: Int) = apply {
         mNotificationConfig.largeIcon = largeIcon
-        this
     }
 
     /**
@@ -157,9 +133,8 @@ class Cactus private constructor() {
      * @param cactusCallback CactusCallback
      * @return Cactus
      */
-    fun addCallback(cactusCallback: CactusCallback) = run {
+    fun addCallback(cactusCallback: CactusCallback) = apply {
         CALLBACKS.add(cactusCallback)
-        this
     }
 
     /**
@@ -167,9 +142,8 @@ class Cactus private constructor() {
      * @param enabled Boolean
      * @return Cactus
      */
-    fun setMusicEnabled(enabled: Boolean) = run {
-        mMusicEnabled = enabled
-        this
+    fun setMusicEnabled(enabled: Boolean) = apply {
+        mDefaultConfig.musicEnabled = enabled
     }
 
     /**
@@ -177,9 +151,8 @@ class Cactus private constructor() {
      * @param musicId Int
      * @return Cactus
      */
-    fun setMusicId(musicId: Int) = run {
-        mMusicId = musicId
-        this
+    fun setMusicId(musicId: Int) = apply {
+        mDefaultConfig.musicId = musicId
     }
 
     /**
@@ -187,11 +160,28 @@ class Cactus private constructor() {
      * @param repeatInterval Long
      * @return Cactus
      */
-    fun setMusicInterval(repeatInterval: Long) = run {
+    fun setMusicInterval(repeatInterval: Long) = apply {
         if (repeatInterval >= 0L) {
-            mRepeatInterval = repeatInterval
+            mDefaultConfig.repeatInterval = repeatInterval
         }
-        this
+    }
+
+    /**
+     * 是否可以使用一像素
+     * @param enabled Boolean
+     * @return Cactus
+     */
+    fun setOnePixEnabled(enabled: Boolean) = apply {
+        mDefaultConfig.onePixEnabled = enabled
+    }
+
+    /**
+     * 一像素模式，感觉没啥用
+     * @param onePixModel OnePixModel
+     * @return Cactus
+     */
+    fun setOnePixModel(onePixModel: OnePixModel) = apply {
+        mDefaultConfig.onePixModel = onePixModel
     }
 
     /**
@@ -199,9 +189,8 @@ class Cactus private constructor() {
      * @param isDebug Boolean
      * @return Cactus
      */
-    fun isDebug(isDebug: Boolean) = run {
-        mDebug = isDebug
-        this
+    fun isDebug(isDebug: Boolean) = apply {
+        mDefaultConfig.debug = isDebug
     }
 
     /**
@@ -209,21 +198,17 @@ class Cactus private constructor() {
      * @param context Context
      */
     fun register(context: Context) {
-        if (context.isMain) {
+        context.apply {
             val cactusConfig = CactusConfig(
-                mDebug,
-                mMusicEnabled,
-                mRepeatInterval,
-                mMusicId,
-                mNotificationConfig
+                mNotificationConfig,
+                mDefaultConfig
             )
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val intent = Intent(context, JobHandlerService::class.java)
-                intent.putExtra(CACTUS_CONFIG, cactusConfig)
-                context.startService(intent)
-            } else {
-                context.registerCactus(cactusConfig)
+            if (isMain) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    registerJobCactus(cactusConfig)
+                } else {
+                    registerCactus(cactusConfig)
+                }
             }
         }
     }

@@ -2,8 +2,12 @@ package com.gyf.cactus.activity
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
+import com.gyf.cactus.Cactus
+import com.gyf.cactus.ext.finishOnePix
 import com.gyf.cactus.ext.isScreenOn
+import com.gyf.cactus.ext.setOnePix
 
 /**
  * @author geyifeng
@@ -13,6 +17,7 @@ class OnePixActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(Cactus.CACTUS_TAG, "one pix is created")
         overridePendingTransition(0, 0)
         //设定一像素的activity
         window.setGravity(Gravity.START or Gravity.TOP)
@@ -22,6 +27,7 @@ class OnePixActivity : Activity() {
             height = 1
             width = 1
         }
+        setOnePix()
     }
 
     override fun onResume() {
@@ -29,6 +35,12 @@ class OnePixActivity : Activity() {
         if (isScreenOn) {
             finish()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        finishOnePix()
+        Log.d(Cactus.CACTUS_TAG, "one pix is destroyed")
     }
 
     override fun finish() {

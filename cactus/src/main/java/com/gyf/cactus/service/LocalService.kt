@@ -9,10 +9,8 @@ import android.util.Log
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.CactusConfig
 import com.gyf.cactus.ICactusInterface
-import com.gyf.cactus.ext.isScreenOn
-import com.gyf.cactus.ext.setNotification
-import com.gyf.cactus.ext.startOnePixActivity
-import com.gyf.cactus.ext.startRemoteService
+import com.gyf.cactus.OnePixModel
+import com.gyf.cactus.ext.*
 
 /**
  * 本地服务
@@ -33,10 +31,10 @@ class LocalService : Service() {
     /**
      * 一像素广播
      */
-    private val mOnePixReceiver = OnePixReceiver()
+    private val mScreenOnOffReceiver = ScreenOnOffReceiver()
 
     /**
-     * 是否在运行
+     * Service是否在运行
      */
     private var mIsServiceRunning = false
 
@@ -124,7 +122,7 @@ class LocalService : Service() {
     /**
      * 屏幕息屏亮屏广播
      */
-    inner class OnePixReceiver : BroadcastReceiver() {
+    inner class ScreenOnOffReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             intent.action?.apply {
@@ -132,12 +130,19 @@ class LocalService : Service() {
                     Intent.ACTION_SCREEN_OFF -> {
                         // 熄屏，打开1像素Activity
                         log("screen off")
-                        startOnePixActivity()
+                        if (mCactusConfig.defaultConfig.onePixEnabled) {
+                            startOnePixActivity()
+                        }
                         playMusic()
                     }
                     Intent.ACTION_SCREEN_ON -> {
                         //亮屏，关闭1像素Activity
                         log("screen on")
+                        mCactusConfig.defaultConfig.apply {
+                            if (onePixEnabled && onePixModel == OnePixModel.DEFAULT) {
+                                finishOnePix()
+                            }
+                        }
                         pauseMusic()
                     }
                 }
@@ -153,23 +158,26 @@ class LocalService : Service() {
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_SCREEN_OFF)
         }
-        registerReceiver(mOnePixReceiver, intentFilter)
+        registerReceiver(mScreenOnOffReceiver, intentFilter)
     }
 
     /**
      * 注册音乐播放器
      */
     private fun registerMedia() {
-        if (mCactusConfig.musicEnabled) {
+        if (mCactusConfig.defaultConfig.musicEnabled) {
             if (mMediaPlayer == null) {
-                mMediaPlayer = MediaPlayer.create(this, mCactusConfig.musicId)
+                mMediaPlayer = MediaPlayer.create(this, mCactusConfig.defaultConfig.musicId)
             }
             mMediaPlayer?.apply {
-                if (!mCactusConfig.debug) {
+                if (!mCactusConfig.defaultConfig.debug) {
                     setVolume(0f, 0f)
                 }
                 setOnCompletionListener {
-                    Handler().postDelayed({ playMusic() }, mCactusConfig.repeatInterval)
+                    Handler().postDelayed(
+                        { playMusic() },
+                        mCactusConfig.defaultConfig.repeatInterval
+                    )
                 }
                 setOnErrorListener { _, _, _ -> false }
                 playMusic()
@@ -182,7 +190,7 @@ class LocalService : Service() {
      */
     private fun playMusic() {
         mMediaPlayer?.apply {
-            if (mCactusConfig.musicEnabled) {
+            if (mCactusConfig.defaultConfig.musicEnabled) {
                 if (!isScreenOn && !mIsMusicRunning) {
                     start()
                     mIsMusicRunning = true
@@ -212,7 +220,7 @@ class LocalService : Service() {
      * @param msg String
      */
     private fun log(msg: String) {
-        if (mCactusConfig.debug) {
+        if (mCactusConfig.defaultConfig.debug) {
             Log.d(Cactus.CACTUS_TAG, msg)
         }
     }

@@ -15,6 +15,10 @@ import com.gyf.cactus.ext.cactus
  */
 class App : Application(), CactusCallback {
 
+    companion object {
+        const val TAG = "cactus-simple"
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -25,8 +29,9 @@ class App : Application(), CactusCallback {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }, PendingIntent.FLAG_UPDATE_CURRENT)
         //注册广播监听器，可选
-        registerReceiver(CactusReceiver(), IntentFilter().apply {
+        registerReceiver(MainReceiver(), IntentFilter().apply {
             addAction(Cactus.CACTUS_WORK)
+            addAction(Cactus.CACTUS_STOP)
         })
 
         cactus {
@@ -38,10 +43,10 @@ class App : Application(), CactusCallback {
     }
 
     override fun doWork() {
-        Log.d("Cactus1", "doWork")
+        Log.d(TAG, "doWork")
     }
 
     override fun onStop() {
-        Log.d("Cactus1", "onStop")
+        Log.d(TAG, "onStop")
     }
 }
