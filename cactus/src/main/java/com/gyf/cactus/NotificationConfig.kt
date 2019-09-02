@@ -5,18 +5,47 @@ import android.os.Parcel
 import android.os.Parcelable
 
 /**
+ * 通知栏信息
+ *
  * @author geyifeng
  * @date 2019-08-28 17:10
  */
 data class NotificationConfig(
+    /**
+     * 服务id
+     */
     var serviceId: Int = (1..Int.MAX_VALUE).random(),
-    var channelId: String = "Cactus",
-    var channelName: String = "Cactus",
-    var title: String = "Cactus",
-    var content: String = "The app of cactus is running",
+    /**
+     * 渠道id
+     */
+    var channelId: String = "WaterBear",
+    /**
+     * 渠道名
+     */
+    var channelName: String = "WaterBear",
+    /**
+     * 标题名
+     */
+    var title: String = "WaterBear",
+    /**
+     * 通知栏内容
+     */
+    var content: String = "WaterBear is running",
+    /**
+     * 小图标
+     */
     var smallIcon: Int = R.drawable.icon_cactus_small,
+    /**
+     * 大图标
+     */
     var largeIcon: Int = R.drawable.icon_cactus_large,
+    /**
+     * 是否隐藏通知栏，对于 Android O以下有效
+     */
     var hideNotification: Boolean = true,
+    /**
+     * 点击标题栏跳转事件
+     */
     var pendingIntent: PendingIntent? = null
 ) : Parcelable {
     constructor(source: Parcel) : this(
