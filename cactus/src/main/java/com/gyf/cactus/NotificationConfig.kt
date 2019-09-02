@@ -18,19 +18,19 @@ data class NotificationConfig(
     /**
      * 渠道id
      */
-    var channelId: String = "WaterBear",
+    var channelId: String = "Cactus",
     /**
      * 渠道名
      */
-    var channelName: String = "WaterBear",
+    var channelName: String = "Cactus",
     /**
      * 标题名
      */
-    var title: String = "WaterBear",
+    var title: String = "Cactus",
     /**
      * 通知栏内容
      */
-    var content: String = "WaterBear is running",
+    var content: String = "The app of cactus is running",
     /**
      * 小图标
      */
