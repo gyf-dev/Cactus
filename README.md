@@ -1,7 +1,7 @@
 ## 使用 
 > android studio
    ```groovy
-   implementation 'com.gyf.cactus:cactus:1.0.1'
+   implementation 'com.gyf.cactus:cactus:1.0.2'
    ```
 
 ## 用法（api请参考注释）
@@ -22,7 +22,7 @@
        setMusicId(R.raw.main)
        isDebug(true)
        addCallback(object : CactusCallback {
-              override fun doWork() {
+              override fun doWork(times:Int) {
                            
               }
        
