@@ -135,24 +135,38 @@ class LocalService : Service() {
                     Intent.ACTION_SCREEN_OFF -> {
                         // 熄屏，打开1像素Activity
                         log("screen off")
-                        if (mCactusConfig.defaultConfig.onePixEnabled) {
-                            mHandler.postDelayed({ startOnePixActivity() }, 1000)
-                        }
+                        openOnePix()
                         playMusic()
                     }
                     Intent.ACTION_SCREEN_ON -> {
                         //亮屏，关闭1像素Activity
                         log("screen on")
-                        mCactusConfig.defaultConfig.apply {
-                            if (onePixEnabled) {
-                                backBackground()
-                                if (onePixModel == OnePixModel.DEFAULT) {
-                                    finishOnePix()
-                                }
-                            }
-                        }
+                        closeOnePix()
                         pauseMusic()
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * 打开一像素
+     */
+    private fun openOnePix() {
+        if (mCactusConfig.defaultConfig.onePixEnabled) {
+            mHandler.postDelayed({ startOnePixActivity() }, 1000)
+        }
+    }
+
+    /**
+     * 关闭一像素
+     */
+    private fun closeOnePix() {
+        mCactusConfig.defaultConfig.apply {
+            if (onePixEnabled) {
+                backBackground()
+                if (onePixModel == OnePixModel.DEFAULT) {
+                    finishOnePix()
                 }
             }
         }
