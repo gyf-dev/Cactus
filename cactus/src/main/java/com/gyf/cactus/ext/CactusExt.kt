@@ -203,15 +203,17 @@ internal fun OnePixActivity.setOnePix() {
  * @receiver Context
  */
 internal fun Context.startOnePixActivity() {
-    mIsForeground = isForeground
-    Log.d(Cactus.CACTUS_TAG, "isForeground:$mIsForeground")
-    val onePixIntent = Intent(this, OnePixActivity::class.java)
-    onePixIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-    onePixIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    val pendingIntent = PendingIntent.getActivity(this, 0, onePixIntent, 0)
-    try {
-        pendingIntent.send()
-    } catch (e: Exception) {
+    if (!isScreenOn) {
+        mIsForeground = isForeground
+        Log.d(Cactus.CACTUS_TAG, "isForeground:$mIsForeground")
+        val onePixIntent = Intent(this, OnePixActivity::class.java)
+        onePixIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        onePixIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val pendingIntent = PendingIntent.getActivity(this, 0, onePixIntent, 0)
+        try {
+            pendingIntent.send()
+        } catch (e: Exception) {
+        }
     }
 }
 
@@ -231,12 +233,16 @@ internal fun finishOnePix() {
  * 退到后台
  * @receiver Context
  */
-internal fun Context.backBackground() {
-    if (!mIsForeground) {
-        val home = Intent(Intent.ACTION_MAIN)
-        home.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        home.addCategory(Intent.CATEGORY_HOME)
-        startActivity(home)
+internal fun backBackground() {
+    mWeakReference?.apply {
+        get()?.apply {
+            if (!mIsForeground && isScreenOn) {
+                val home = Intent(Intent.ACTION_MAIN)
+                home.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                home.addCategory(Intent.CATEGORY_HOME)
+                startActivity(home)
+            }
+        }
     }
 }
 
@@ -264,8 +270,12 @@ internal val Context.isForeground
  */
 internal val Context.isScreenOn
     get() = run {
-        val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
-        pm.isScreenOn
+        try {
+            val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+            pm.isScreenOn
+        } catch (e: Exception) {
+            false
+        }
     }
 
 /**

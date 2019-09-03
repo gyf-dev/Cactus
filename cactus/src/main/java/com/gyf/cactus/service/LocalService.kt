@@ -5,6 +5,7 @@ import android.content.*
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
@@ -43,6 +44,8 @@ class LocalService : Service() {
      * 音乐是否在播放
      */
     private var mIsMusicRunning = false
+
+    private val mHandler = Handler(Looper.getMainLooper())
 
     private lateinit var mLocalBinder: LocalBinder
 
@@ -133,7 +136,7 @@ class LocalService : Service() {
                         // 熄屏，打开1像素Activity
                         log("screen off")
                         if (mCactusConfig.defaultConfig.onePixEnabled) {
-                            startOnePixActivity()
+                            mHandler.postDelayed({ startOnePixActivity() }, 1000)
                         }
                         playMusic()
                     }
@@ -179,7 +182,7 @@ class LocalService : Service() {
                     setVolume(0f, 0f)
                 }
                 setOnCompletionListener {
-                    Handler().postDelayed(
+                    mHandler.postDelayed(
                         { playMusic() },
                         mCactusConfig.defaultConfig.repeatInterval
                     )

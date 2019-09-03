@@ -8,6 +8,8 @@
     <application>
         <activity
             android:name=".pix.OnePixActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
             android:theme="@style/OnePixTheme" />
 
         <service
