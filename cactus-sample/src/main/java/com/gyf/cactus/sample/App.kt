@@ -1,13 +1,22 @@
 package com.gyf.cactus.sample
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.CactusCallback
 import com.gyf.cactus.ext.cactus
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * @author geyifeng
@@ -16,12 +25,15 @@ import com.gyf.cactus.ext.cactus
 class App : Application(), CactusCallback {
 
     companion object {
-        const val TAG = "cactus-simple"
+        const val TAG = "cactus-sample"
+        @SuppressLint("StaticFieldLeak")
+        lateinit var context: Context
+        val mTimer = MutableLiveData<String>()
     }
 
     override fun onCreate() {
         super.onCreate()
-
+        context = applicationContext
         // 设置通知栏点击事件，可选
         val pendingIntent =
             PendingIntent.getActivity(this, 0, Intent().apply {
@@ -42,8 +54,25 @@ class App : Application(), CactusCallback {
         }
     }
 
-    override fun doWork() {
-        Log.d(TAG, "doWork")
+    @SuppressLint("CheckResult")
+    override fun doWork(times: Int) {
+        var oldTimer = Save.timer
+        if (times == 1) {
+            oldTimer = 0L
+        }
+        Log.d(TAG, "doWork:$times")
+        val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        dateFormat.timeZone = TimeZone.getTimeZone("GMT+00:00")
+        Observable.interval(1, TimeUnit.SECONDS)
+            .map {
+                oldTimer + it
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { aLong ->
+                Save.timer = aLong
+                mTimer.value = dateFormat.format(Date(aLong * 1000))
+            }
     }
 
     override fun onStop() {

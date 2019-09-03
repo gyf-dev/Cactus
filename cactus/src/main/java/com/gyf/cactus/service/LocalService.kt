@@ -49,6 +49,8 @@ class LocalService : Service() {
 
     private lateinit var mLocalBinder: LocalBinder
 
+    private var mConnectionTimes = 0
+
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             startRemoteService(this, mCactusConfig)
@@ -59,6 +61,7 @@ class LocalService : Service() {
                 ICactusInterface.Stub.asInterface(it)
                     ?.apply {
                         wakeup(mCactusConfig)
+                        connectionTimes(++mConnectionTimes)
                     }
             }
         }
@@ -72,7 +75,6 @@ class LocalService : Service() {
         registerMedia()
         registerBroadcastReceiver()
         startRemoteService(mServiceConnection, mCactusConfig)
-        doWork()
         return START_STICKY
     }
 
@@ -84,13 +86,13 @@ class LocalService : Service() {
     /**
      * 处理外部事情
      */
-    private fun doWork() {
+    private fun doWork(times: Int) {
         if (!mIsServiceRunning) {
             log("LocalService is run!")
             sendBroadcast(Intent(Cactus.CACTUS_WORK))
             if (Cactus.CALLBACKS.isNotEmpty()) {
                 Cactus.CALLBACKS.forEach {
-                    it.doWork()
+                    it.doWork(times)
                 }
             }
             mIsServiceRunning = true
@@ -121,6 +123,11 @@ class LocalService : Service() {
         override fun wakeup(config: CactusConfig) {
             setNotification(config.notificationConfig)
             mCactusConfig = config
+        }
+
+        override fun connectionTimes(time: Int) {
+            mConnectionTimes = time
+            doWork((mConnectionTimes + 1) / 2)
         }
     }
 

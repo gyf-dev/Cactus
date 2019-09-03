@@ -26,6 +26,8 @@ class RemoteService : Service() {
 
     private lateinit var remoteBinder: RemoteBinder
 
+    private var mConnectionTimes = 0
+
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             startLocalService(this, true, mCactusConfig)
@@ -36,6 +38,7 @@ class RemoteService : Service() {
                 ICactusInterface.Stub.asInterface(it)
                     ?.apply {
                         wakeup(mCactusConfig)
+                        connectionTimes(++mConnectionTimes)
                     }
             }
         }
@@ -61,6 +64,10 @@ class RemoteService : Service() {
         override fun wakeup(config: CactusConfig) {
             setNotification(config.notificationConfig)
             mCactusConfig = config
+        }
+
+        override fun connectionTimes(time: Int) {
+            mConnectionTimes = time
         }
     }
 
