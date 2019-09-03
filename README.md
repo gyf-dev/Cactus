@@ -1,11 +1,10 @@
 ## 使用 
 > android studio
    ```groovy
-   // 基础依赖包，必须要依赖
    implementation 'com.gyf.cactus:cactus:1.0.1'
    ```
 
-## Api详解（api请参考注释）
+## 用法（api请参考注释）
 - java用法
 
    ```java

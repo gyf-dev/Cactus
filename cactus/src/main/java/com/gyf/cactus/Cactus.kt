@@ -200,13 +200,10 @@ class Cactus private constructor() {
      * @param context Context
      */
     fun register(context: Context) {
-        context.apply {
-            val cactusConfig = CactusConfig(
-                mNotificationConfig,
-                mDefaultConfig
-            )
-            mCactusConfig = cactusConfig
-            context.register(cactusConfig)
-        }
+        mCactusConfig = CactusConfig(
+            mNotificationConfig,
+            mDefaultConfig
+        )
+        context.register(mCactusConfig)
     }
 }
