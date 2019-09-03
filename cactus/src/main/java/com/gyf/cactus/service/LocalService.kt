@@ -45,11 +45,14 @@ class LocalService : Service() {
      */
     private var mIsMusicRunning = false
 
+    /**
+     * 服务连接次数
+     */
+    private var mConnectionTimes = 0
+
     private val mHandler = Handler(Looper.getMainLooper())
 
     private lateinit var mLocalBinder: LocalBinder
-
-    private var mConnectionTimes = 0
 
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {

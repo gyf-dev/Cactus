@@ -24,9 +24,12 @@ class RemoteService : Service() {
      */
     private lateinit var mCactusConfig: CactusConfig
 
-    private lateinit var remoteBinder: RemoteBinder
-
+    /**
+     * 服务连接次数
+     */
     private var mConnectionTimes = 0
+
+    private lateinit var remoteBinder: RemoteBinder
 
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
