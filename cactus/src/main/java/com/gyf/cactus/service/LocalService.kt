@@ -141,8 +141,11 @@ class LocalService : Service() {
                         //亮屏，关闭1像素Activity
                         log("screen on")
                         mCactusConfig.defaultConfig.apply {
-                            if (onePixEnabled && onePixModel == OnePixModel.DEFAULT) {
-                                finishOnePix()
+                            if (onePixEnabled) {
+                                backBackground()
+                                if (onePixModel == OnePixModel.DEFAULT) {
+                                    finishOnePix()
+                                }
                             }
                         }
                         pauseMusic()

@@ -1,5 +1,6 @@
 package com.gyf.cactus.ext
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Handler
 import android.os.PowerManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.Constraints
 import androidx.work.NetworkType
@@ -36,6 +38,10 @@ import java.util.concurrent.TimeUnit
  * 用以保存一像素Activity
  */
 private var mWeakReference: WeakReference<Activity>? = null
+/**
+ * 用来表示是前台还是后台
+ */
+private var mIsForeground = false
 
 /**
  * kotlin里使用Cactus
@@ -145,22 +151,6 @@ internal fun Service.setNotification(
 }
 
 /**
- * 隐藏通知栏
- * @receiver Service
- * @param notificationConfig NotificationConfig
- */
-internal fun Service.hideNotification(notificationConfig: NotificationConfig) {
-    try {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
-            val intent = Intent(this, HideForegroundService::class.java)
-            intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, notificationConfig)
-            startService(intent)
-        }
-    } catch (e: Exception) {
-    }
-}
-
-/**
  * 开启远程服务
  * @receiver Service
  * @param serviceConnection ServiceConnection
@@ -213,6 +203,8 @@ internal fun OnePixActivity.setOnePix() {
  * @receiver Context
  */
 internal fun Context.startOnePixActivity() {
+    mIsForeground = isForeground
+    Log.d(Cactus.CACTUS_TAG, "isForeground:$mIsForeground")
     val onePixIntent = Intent(this, OnePixActivity::class.java)
     onePixIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     onePixIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -234,6 +226,38 @@ internal fun finishOnePix() {
         mWeakReference = null
     }
 }
+
+/**
+ * 退到后台
+ * @receiver Context
+ */
+internal fun Context.backBackground() {
+    if (!mIsForeground) {
+        val home = Intent(Intent.ACTION_MAIN)
+        home.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        home.addCategory(Intent.CATEGORY_HOME)
+        startActivity(home)
+    }
+}
+
+/**
+ * 是否在前台
+ */
+internal val Context.isForeground
+    @SuppressLint("NewApi")
+    get() = run {
+        var foreground = false
+        val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val tasks = am.getRunningTasks(1)
+        tasks?.apply {
+            if (isNotEmpty()) {
+                this[0].topActivity?.let {
+                    foreground = (it.packageName == packageName)
+                }
+            }
+        }
+        foreground
+    }
 
 /**
  * 屏幕是否亮屏
