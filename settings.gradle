@@ -1,2 +1,2 @@
-include ':cactus-simple', ':cactus'
+include ':cactus-sample', ':cactus'
 rootProject.name='Cactus'

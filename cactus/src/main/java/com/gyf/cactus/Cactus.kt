@@ -2,11 +2,11 @@ package com.gyf.cactus
 
 import android.app.PendingIntent
 import android.content.Context
-import android.os.Build
-import com.gyf.cactus.ext.isMain
+import com.gyf.cactus.pix.OnePixModel
+import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.DefaultConfig
+import com.gyf.cactus.entity.NotificationConfig
 import com.gyf.cactus.ext.register
-import com.gyf.cactus.ext.registerCactus
-import com.gyf.cactus.ext.registerJobCactus
 
 /**
  * Cactus保活方案，Cactus有两种形式处理回调事件，

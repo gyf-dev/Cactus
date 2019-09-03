@@ -8,9 +8,9 @@ import android.os.IBinder
 import android.util.Log
 import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
-import com.gyf.cactus.CactusConfig
-import com.gyf.cactus.ICactusInterface
-import com.gyf.cactus.OnePixModel
+import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.ICactusInterface
+import com.gyf.cactus.pix.OnePixModel
 import com.gyf.cactus.ext.*
 
 /**

@@ -7,8 +7,8 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import com.gyf.cactus.Cactus
-import com.gyf.cactus.CactusConfig
-import com.gyf.cactus.ICactusInterface
+import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.ICactusInterface
 import com.gyf.cactus.ext.setNotification
 import com.gyf.cactus.ext.startLocalService
 

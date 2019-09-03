@@ -12,7 +12,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.gyf.cactus.Cactus
-import com.gyf.cactus.CactusConfig
+import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.ext.isServiceRunning
 import com.gyf.cactus.ext.registerCactus
 import com.gyf.cactus.ext.setNotification

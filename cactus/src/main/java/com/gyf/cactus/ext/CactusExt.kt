@@ -14,9 +14,9 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
-import com.gyf.cactus.CactusConfig
-import com.gyf.cactus.NotificationConfig
-import com.gyf.cactus.activity.OnePixActivity
+import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.NotificationConfig
+import com.gyf.cactus.pix.OnePixActivity
 import com.gyf.cactus.service.CactusJobService
 import com.gyf.cactus.service.HideForegroundService
 import com.gyf.cactus.service.LocalService

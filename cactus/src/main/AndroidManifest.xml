@@ -7,7 +7,7 @@
 
     <application>
         <activity
-            android:name=".activity.OnePixActivity"
+            android:name=".pix.OnePixActivity"
             android:theme="@style/OnePixTheme" />
 
         <service

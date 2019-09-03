@@ -4,7 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
-import com.gyf.cactus.NotificationConfig
+import com.gyf.cactus.entity.NotificationConfig
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.ext.setNotification
 
