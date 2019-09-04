@@ -91,6 +91,7 @@ class LocalService : Service() {
     private fun doWork(times: Int) {
         if (!mIsServiceRunning) {
             log("LocalService is run!")
+            mIsServiceRunning = true
             registerMedia()
             registerBroadcastReceiver()
             sendBroadcast(Intent(Cactus.CACTUS_WORK))
@@ -99,7 +100,6 @@ class LocalService : Service() {
                     it.doWork(times)
                 }
             }
-            mIsServiceRunning = true
         }
     }
 
