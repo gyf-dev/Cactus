@@ -29,6 +29,7 @@ class App : Application(), CactusCallback {
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
         val mTimer = MutableLiveData<String>()
+        val mLastTimer = MutableLiveData<String>()
     }
 
     override fun onCreate() {
@@ -56,13 +57,15 @@ class App : Application(), CactusCallback {
 
     @SuppressLint("CheckResult")
     override fun doWork(times: Int) {
-        var oldTimer = Save.timer
-        if (times == 1) {
-            oldTimer = 0L
-        }
         Log.d(TAG, "doWork:$times")
         val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         dateFormat.timeZone = TimeZone.getTimeZone("GMT+00:00")
+        var oldTimer = Save.timer
+        if (times == 1) {
+            Save.lastTimer = oldTimer
+            oldTimer = 0L
+        }
+        mLastTimer.postValue(dateFormat.format(Date(Save.lastTimer * 1000)))
         Observable.interval(1, TimeUnit.SECONDS)
             .map {
                 oldTimer + it

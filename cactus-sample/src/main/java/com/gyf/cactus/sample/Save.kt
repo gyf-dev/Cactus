@@ -9,4 +9,5 @@ import android.annotation.SuppressLint
 @SuppressLint("StaticFieldLeak")
 object Save {
     var timer by preference(0L)
+    var lastTimer by preference(0L)
 }

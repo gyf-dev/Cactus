@@ -24,5 +24,8 @@ class MainActivity : AppCompatActivity() {
         App.mTimer.observe(this, Observer<String> {
             tvTimer.text = it
         })
+        App.mLastTimer.observe(this, Observer<String> {
+            tvLastTimer.text = it
+        })
     }
 }
