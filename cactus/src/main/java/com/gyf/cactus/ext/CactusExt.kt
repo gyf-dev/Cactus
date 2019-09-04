@@ -203,7 +203,7 @@ internal fun OnePixActivity.setOnePix() {
  * @receiver Context
  */
 internal fun Context.startOnePixActivity() {
-    if (!isScreenOn) {
+    if (!isScreenOn && Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
         mIsForeground = isForeground
         Log.d(Cactus.CACTUS_TAG, "isForeground:$mIsForeground")
         val onePixIntent = Intent(this, OnePixActivity::class.java)
@@ -341,7 +341,7 @@ internal fun Context.isRunningTaskExist(processName: String): Boolean {
     val processList = am.runningAppProcesses
     if (processList != null) {
         for (info in processList) {
-            if (info.processName == processName) {
+            if (info.processName.contains(processName)) {
                 return true
             }
         }

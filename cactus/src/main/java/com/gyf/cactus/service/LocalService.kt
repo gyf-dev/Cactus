@@ -75,8 +75,6 @@ class LocalService : Service() {
             mCactusConfig = it
         }
         setNotification(mCactusConfig.notificationConfig)
-        registerMedia()
-        registerBroadcastReceiver()
         startRemoteService(mServiceConnection, mCactusConfig)
         return START_STICKY
     }
@@ -88,10 +86,13 @@ class LocalService : Service() {
 
     /**
      * 处理外部事情
+     * @param times Int
      */
     private fun doWork(times: Int) {
         if (!mIsServiceRunning) {
             log("LocalService is run!")
+            registerMedia()
+            registerBroadcastReceiver()
             sendBroadcast(Intent(Cactus.CACTUS_WORK))
             if (Cactus.CALLBACKS.isNotEmpty()) {
                 Cactus.CALLBACKS.forEach {
@@ -207,7 +208,10 @@ class LocalService : Service() {
                 }
                 setOnCompletionListener {
                     mHandler.postDelayed(
-                        { playMusic() },
+                        {
+                            mIsMusicRunning = false
+                            playMusic()
+                        },
                         mCactusConfig.defaultConfig.repeatInterval
                     )
                 }
@@ -221,16 +225,18 @@ class LocalService : Service() {
      * 播放音乐
      */
     private fun playMusic() {
-        mMediaPlayer?.apply {
-            if (mCactusConfig.defaultConfig.musicEnabled) {
-                if (!isScreenOn && !mIsMusicRunning) {
-                    start()
-                    mIsMusicRunning = true
-                    log("music is playing")
+        if (!isScreenOn) {
+            mMediaPlayer?.apply {
+                if (mCactusConfig.defaultConfig.musicEnabled) {
+                    if (!mIsMusicRunning) {
+                        start()
+                        mIsMusicRunning = true
+                        log("music is playing")
+                    }
                 }
-            } else {
-                pauseMusic()
             }
+        } else {
+            pauseMusic()
         }
     }
 
