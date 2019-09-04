@@ -28,8 +28,18 @@ class App : Application(), CactusCallback {
         const val TAG = "cactus-sample"
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
-        val mTimer = MutableLiveData<String>()
+        /**
+         * 结束时间
+         */
+        val mEndDate = MutableLiveData<String>()
+        /**
+         * 上次存活时间
+         */
         val mLastTimer = MutableLiveData<String>()
+        /**
+         * 存活时间
+         */
+        val mTimer = MutableLiveData<String>()
     }
 
     override fun onCreate() {
@@ -63,9 +73,11 @@ class App : Application(), CactusCallback {
         var oldTimer = Save.timer
         if (times == 1) {
             Save.lastTimer = oldTimer
+            Save.endDate = Save.date
             oldTimer = 0L
         }
         mLastTimer.postValue(dateFormat.format(Date(Save.lastTimer * 1000)))
+        mEndDate.postValue(Save.endDate)
         Observable.interval(1, TimeUnit.SECONDS)
             .map {
                 oldTimer + it
@@ -74,6 +86,9 @@ class App : Application(), CactusCallback {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { aLong ->
                 Save.timer = aLong
+                Save.date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).run {
+                    format(Date())
+                }
                 mTimer.value = dateFormat.format(Date(aLong * 1000))
             }
     }

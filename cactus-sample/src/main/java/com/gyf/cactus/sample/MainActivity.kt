@@ -21,11 +21,14 @@ class MainActivity : AppCompatActivity() {
                 2 / 0
             }, 3000)
         }
-        App.mTimer.observe(this, Observer<String> {
-            tvTimer.text = it
+        App.mEndDate.observe(this, Observer {
+            tvLastDate.text = it
         })
         App.mLastTimer.observe(this, Observer<String> {
             tvLastTimer.text = it
+        })
+        App.mTimer.observe(this, Observer<String> {
+            tvTimer.text = it
         })
     }
 }

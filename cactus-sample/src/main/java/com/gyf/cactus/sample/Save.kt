@@ -10,4 +10,6 @@ import android.annotation.SuppressLint
 object Save {
     var timer by preference(0L)
     var lastTimer by preference(0L)
+    var date by preference("0000-01-01 00:00:00")
+    var endDate by preference("0000-01-01 00:00:00")
 }
