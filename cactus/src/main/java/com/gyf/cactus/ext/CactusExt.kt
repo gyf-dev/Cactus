@@ -163,7 +163,7 @@ internal fun Service.startRemoteService(
     val intent = Intent(this, RemoteService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
     startService(intent)
-    bindService(intent, serviceConnection, Context.BIND_ABOVE_CLIENT)
+    bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
 }
 
 /**
@@ -185,7 +185,7 @@ internal fun Service.startLocalService(
     if (isStart) {
         startService(intent)
     }
-    bindService(intent, serviceConnection, Context.BIND_ABOVE_CLIENT)
+    bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
 }
 
 /**
