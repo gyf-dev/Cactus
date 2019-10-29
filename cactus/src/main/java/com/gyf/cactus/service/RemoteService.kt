@@ -47,8 +47,8 @@ class RemoteService : Service() {
         }
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        intent.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
             mCactusConfig = it
         }
         setNotification(mCactusConfig.notificationConfig)
