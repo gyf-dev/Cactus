@@ -140,6 +140,26 @@ class Cactus private constructor() {
     }
 
     /**
+     * 增加回调 lambda形式
+     * @param stop Function0<Unit>
+     * @param work Function1<Int, Unit>
+     * @return Cactus
+     */
+    fun addCallback(stop: (() -> Unit)? = null, work: (Int) -> Unit) = apply {
+        CALLBACKS.add(object : CactusCallback {
+            override fun doWork(times: Int) {
+                work(times)
+            }
+
+            override fun onStop() {
+                stop?.let {
+                    it()
+                }
+            }
+        })
+    }
+
+    /**
      * 是否可以播放音乐
      * @param enabled Boolean
      * @return Cactus

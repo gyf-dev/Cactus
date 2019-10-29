@@ -115,6 +115,7 @@ class LocalService : Service() {
                 it.onStop()
             }
         }
+        unregisterReceiver(mScreenOnOffReceiver)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
