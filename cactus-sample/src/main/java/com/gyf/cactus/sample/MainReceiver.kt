@@ -15,7 +15,19 @@ class MainReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         intent.action?.apply {
             when (this) {
-                Cactus.CACTUS_WORK, Cactus.CACTUS_STOP -> {
+                Cactus.CACTUS_WORK -> {
+                    Log.d(
+                        App.TAG,
+                        this + "--" + intent.getIntExtra(Cactus.CACTUS_TIMES, 0)
+                    )
+                }
+                Cactus.CACTUS_STOP -> {
+                    Log.d(App.TAG, this)
+                }
+                Cactus.CACTUS_BACKGROUND -> {
+                    Log.d(App.TAG, this)
+                }
+                Cactus.CACTUS_FOREGROUND -> {
                     Log.d(App.TAG, this)
                 }
             }

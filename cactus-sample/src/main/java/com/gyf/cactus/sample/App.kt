@@ -7,8 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import com.gyf.cactus.AppBackgroundCallbacks
 import com.gyf.cactus.Cactus
+import com.gyf.cactus.CactusBackgroundCallback
 import com.gyf.cactus.CactusCallback
 import com.gyf.cactus.ext.cactus
 import io.reactivex.Observable
@@ -45,24 +48,40 @@ class App : Application(), CactusCallback {
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
-        // 设置通知栏点击事件，可选
+        //可选，设置通知栏点击事件
         val pendingIntent =
             PendingIntent.getActivity(this, 0, Intent().apply {
                 setClass(this@App, MainActivity::class.java)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }, PendingIntent.FLAG_UPDATE_CURRENT)
-        //注册广播监听器，可选
+        //可选，注册广播监听器
         registerReceiver(MainReceiver(), IntentFilter().apply {
             addAction(Cactus.CACTUS_WORK)
             addAction(Cactus.CACTUS_STOP)
+            addAction(Cactus.CACTUS_BACKGROUND)
+            addAction(Cactus.CACTUS_FOREGROUND)
         })
 
         cactus {
+            //可选，设置通知栏点击事件
             setPendingIntent(pendingIntent)
+            //可选，设置音乐
             setMusicId(R.raw.main)
+            //可选，是否是debug模式
             isDebug(true)
+            //可选，退到后台是否可以播放音乐
+            setBackgroundMusicEnabled(true)
+            //可选，运行时回调
             addCallback(this@App)
+            //可选，切后台切换回调
+            addBackgroundCallback {
+                Toast.makeText(this@App, if (it) "退到后台啦" else "跑到前台啦", Toast.LENGTH_SHORT).show()
+            }
         }
+        //或者这样设置前后台监听
+//        registerActivityLifecycleCallbacks(AppBackgroundCallbacks {
+//
+//        })
     }
 
     @SuppressLint("CheckResult")

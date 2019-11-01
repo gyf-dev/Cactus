@@ -2,11 +2,11 @@ package com.gyf.cactus
 
 import android.app.PendingIntent
 import android.content.Context
-import com.gyf.cactus.pix.OnePixModel
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.DefaultConfig
 import com.gyf.cactus.entity.NotificationConfig
 import com.gyf.cactus.ext.register
+import com.gyf.cactus.pix.OnePixModel
 
 /**
  * Cactus保活方案，Cactus有两种形式处理回调事件，
@@ -29,12 +29,31 @@ class Cactus private constructor() {
     private val mDefaultConfig = DefaultConfig()
 
     companion object {
+        /**
+         * 运行时回调广播ACTION
+         */
         const val CACTUS_WORK = "com.gyf.cactus.work"
+        /**
+         * 停止时回调广播ACTION
+         */
         const val CACTUS_STOP = "com.gyf.cactus.stop"
+        /**
+         * 后台回调广播ACTION
+         */
+        const val CACTUS_BACKGROUND = "com.gyf.cactus.background"
+        /**
+         * 前台后调广播ACTION
+         */
+        const val CACTUS_FOREGROUND = "com.gyf.cactus.foreground"
+        /**
+         * key，通过广播形式获取启动次数
+         */
+        const val CACTUS_TIMES = "times"
         internal const val CACTUS_TAG = "cactus"
         internal const val CACTUS_CONFIG = "cactusConfig"
         internal const val CACTUS_NOTIFICATION_CONFIG = "notificationConfig"
         internal val CALLBACKS = arrayListOf<CactusCallback>()
+        internal val BACKGROUND_CALLBACKS = arrayListOf<CactusBackgroundCallback>()
         internal var mCactusConfig = CactusConfig()
         @JvmStatic
         val instance by lazy { Cactus() }
@@ -160,12 +179,44 @@ class Cactus private constructor() {
     }
 
     /**
+     * 前后台切换回调
+     *
+     * @param cactusBackgroundCallback CactusBackgroundCallback
+     */
+    fun addBackgroundCallback(cactusBackgroundCallback: CactusBackgroundCallback) {
+        BACKGROUND_CALLBACKS.add(cactusBackgroundCallback)
+    }
+
+    /**
+     * 前后台切换回调
+     *
+     * @param block [@kotlin.ExtensionFunctionType] Function1<Boolean, Unit>
+     */
+    fun addBackgroundCallback(block: (Boolean) -> Unit) {
+        BACKGROUND_CALLBACKS.add(object : CactusBackgroundCallback {
+            override fun onBackground(background: Boolean) {
+                block(background)
+            }
+        })
+    }
+
+    /**
      * 是否可以播放音乐
      * @param enabled Boolean
      * @return Cactus
      */
     fun setMusicEnabled(enabled: Boolean) = apply {
         mDefaultConfig.musicEnabled = enabled
+    }
+
+    /**
+     * 后台是否可以播放音乐
+     *
+     * @param enabled Boolean
+     * @return WaterBear
+     */
+    fun setBackgroundMusicEnabled(enabled: Boolean) = apply {
+        mDefaultConfig.backgroundMusicEnabled = enabled
     }
 
     /**

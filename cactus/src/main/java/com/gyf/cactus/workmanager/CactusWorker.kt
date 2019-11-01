@@ -15,10 +15,12 @@ import com.gyf.cactus.ext.register
 class CactusWorker(context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
     override fun doWork(): Result {
-        Log.d(
-            Cactus.CACTUS_TAG,
-            "CactusWorker-isServiceRunning${applicationContext.isServiceRunning}"
-        )
+        if (Cactus.mCactusConfig.defaultConfig.debug) {
+            Log.d(
+                Cactus.CACTUS_TAG,
+                "CactusWorker-isServiceRunning${applicationContext.isServiceRunning}"
+            )
+        }
         if (!applicationContext.isServiceRunning) {
             applicationContext.register(Cactus.mCactusConfig)
         }

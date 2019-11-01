@@ -15,6 +15,7 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.gyf.cactus.AppBackgroundCallbacks
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.NotificationConfig
@@ -62,6 +63,9 @@ internal fun Context.register(cactusConfig: CactusConfig) {
             registerJobCactus(cactusConfig)
         } else {
             registerCactus(cactusConfig)
+        }
+        if (this is Application) {
+            registerActivityLifecycleCallbacks(AppBackgroundCallbacks())
         }
     }
 }

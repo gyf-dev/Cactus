@@ -11,8 +11,8 @@ import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.ICactusInterface
-import com.gyf.cactus.pix.OnePixModel
 import com.gyf.cactus.ext.*
+import com.gyf.cactus.pix.OnePixModel
 
 /**
  * 本地服务
@@ -94,7 +94,7 @@ class LocalService : Service() {
             log("LocalService is run!")
             registerMedia()
             registerBroadcastReceiver()
-            sendBroadcast(Intent(Cactus.CACTUS_WORK))
+            sendBroadcast(Intent(Cactus.CACTUS_WORK).putExtra(Cactus.CACTUS_TIMES, times))
             if (Cactus.CALLBACKS.isNotEmpty()) {
                 Cactus.CALLBACKS.forEach {
                     it.doWork(times)
@@ -137,12 +137,12 @@ class LocalService : Service() {
     }
 
     /**
-     * 屏幕息屏亮屏广播
+     * 屏幕息屏亮屏与前后台切换广播
      */
     inner class ScreenOnOffReceiver : BroadcastReceiver() {
 
-        override fun onReceive(context: Context, intent: Intent) {
-            intent.action?.apply {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.action?.apply {
                 when (this) {
                     Intent.ACTION_SCREEN_OFF -> {
                         // 熄屏，打开1像素Activity
@@ -154,7 +154,21 @@ class LocalService : Service() {
                         //亮屏，关闭1像素Activity
                         log("screen on")
                         closeOnePix()
+                        if (!mCactusConfig.defaultConfig.backgroundMusicEnabled) {
+                            pauseMusic()
+                        }
+                    }
+                    Cactus.CACTUS_BACKGROUND -> {
+                        log("background")
+                        if (mCactusConfig.defaultConfig.backgroundMusicEnabled) {
+                            playMusic()
+                        }
+                        onBackground(true)
+                    }
+                    Cactus.CACTUS_FOREGROUND -> {
+                        log("foreground")
                         pauseMusic()
+                        onBackground(false)
                     }
                 }
             }
@@ -185,14 +199,28 @@ class LocalService : Service() {
     }
 
     /**
+     * 是否是在后台
+     *
+     * @param background Boolean
+     */
+    private fun onBackground(background: Boolean) {
+        if (Cactus.BACKGROUND_CALLBACKS.isNotEmpty()) {
+            Cactus.BACKGROUND_CALLBACKS.forEach {
+                it.onBackground(background)
+            }
+        }
+    }
+
+    /**
      * 注册息屏亮屏广播监听
      */
     private fun registerBroadcastReceiver() {
-        val intentFilter = IntentFilter().apply {
+        registerReceiver(mScreenOnOffReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_SCREEN_OFF)
-        }
-        registerReceiver(mScreenOnOffReceiver, intentFilter)
+            addAction(Cactus.CACTUS_BACKGROUND)
+            addAction(Cactus.CACTUS_FOREGROUND)
+        })
     }
 
     /**
@@ -217,7 +245,9 @@ class LocalService : Service() {
                     )
                 }
                 setOnErrorListener { _, _, _ -> false }
-                playMusic()
+                if (!isScreenOn) {
+                    playMusic()
+                }
             }
         }
     }
@@ -226,18 +256,14 @@ class LocalService : Service() {
      * 播放音乐
      */
     private fun playMusic() {
-        if (!isScreenOn) {
-            mMediaPlayer?.apply {
-                if (mCactusConfig.defaultConfig.musicEnabled) {
-                    if (!mIsMusicRunning) {
-                        start()
-                        mIsMusicRunning = true
-                        log("music is playing")
-                    }
+        mMediaPlayer?.apply {
+            if (mCactusConfig.defaultConfig.musicEnabled) {
+                if (!mIsMusicRunning) {
+                    start()
+                    mIsMusicRunning = true
+                    log("music is playing")
                 }
             }
-        } else {
-            pauseMusic()
         }
     }
 

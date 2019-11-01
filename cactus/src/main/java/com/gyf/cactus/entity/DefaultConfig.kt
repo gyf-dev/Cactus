@@ -2,8 +2,8 @@ package com.gyf.cactus.entity
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.gyf.cactus.pix.OnePixModel
 import com.gyf.cactus.R
+import com.gyf.cactus.pix.OnePixModel
 
 /**
  * 默认配置信息
@@ -19,6 +19,10 @@ data class DefaultConfig(
      * 是否可以使用后台音乐
      */
     var musicEnabled: Boolean = true,
+    /**
+     * app退出到后台是否可以播放音乐
+     */
+    var backgroundMusicEnabled: Boolean = false,
     /**
      * 音乐播放循环间隔
      */
@@ -39,6 +43,7 @@ data class DefaultConfig(
     constructor(source: Parcel) : this(
         1 == source.readInt(),
         1 == source.readInt(),
+        1 == source.readInt(),
         source.readLong(),
         source.readInt(),
         1 == source.readInt(),
@@ -50,6 +55,7 @@ data class DefaultConfig(
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeInt((if (debug) 1 else 0))
         writeInt((if (musicEnabled) 1 else 0))
+        writeInt((if (backgroundMusicEnabled) 1 else 0))
         writeLong(repeatInterval)
         writeInt(musicId)
         writeInt((if (onePixEnabled) 1 else 0))
@@ -60,9 +66,7 @@ data class DefaultConfig(
         @JvmField
         val CREATOR: Parcelable.Creator<DefaultConfig> =
             object : Parcelable.Creator<DefaultConfig> {
-                override fun createFromParcel(source: Parcel): DefaultConfig =
-                    DefaultConfig(source)
-
+                override fun createFromParcel(source: Parcel): DefaultConfig = DefaultConfig(source)
                 override fun newArray(size: Int): Array<DefaultConfig?> = arrayOfNulls(size)
             }
     }
