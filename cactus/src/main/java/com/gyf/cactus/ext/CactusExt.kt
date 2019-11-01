@@ -65,7 +65,7 @@ internal fun Context.register(cactusConfig: CactusConfig) {
             registerCactus(cactusConfig)
         }
         if (this is Application) {
-            registerActivityLifecycleCallbacks(AppBackgroundCallbacks())
+            registerActivityLifecycleCallbacks(AppBackgroundCallbacks(this))
         }
     }
 }

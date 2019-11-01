@@ -16,18 +16,33 @@ import java.lang.ref.WeakReference
  * @author geyifeng
  * @date 2019-11-01 10:36
  */
-class AppBackgroundCallbacks @JvmOverloads constructor(private var block: ((Boolean) -> Unit)? = null) :
+class AppBackgroundCallbacks @JvmOverloads constructor(
+    private var context: Context? = null,
+    private var block: ((Boolean) -> Unit)? = null
+) :
     Application.ActivityLifecycleCallbacks {
 
     private val mHandler by lazy {
         Handler()
     }
 
-    private lateinit var mContext: WeakReference<Context>
+    private var mContext: WeakReference<Context>? = null
 
     private var mFrontActivityCount = 0
     private var mIsSend = false
     private var mIsFirst = true
+
+    companion object {
+        private const val FIRST_TIME = 1000L
+    }
+
+    init {
+        mHandler.postDelayed({
+            if (mFrontActivityCount == 0) {
+                post()
+            }
+        }, FIRST_TIME)
+    }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         if (activity !is OnePixActivity) {
@@ -62,29 +77,36 @@ class AppBackgroundCallbacks @JvmOverloads constructor(private var block: ((Bool
     }
 
     private fun post() {
-        mContext.get()?.apply {
+        (mContext?.get() ?: context)?.apply {
             if (mFrontActivityCount == 0) {
                 mIsSend = false
-                sendBroadcast(Intent().setAction(Cactus.CACTUS_BACKGROUND))
-                block?.let { it(true) }
+                mHandler.postDelayed {
+                    sendBroadcast(Intent().setAction(Cactus.CACTUS_BACKGROUND))
+                    block?.let { it(true) }
+                }
             } else {
                 if (!mIsSend) {
                     mIsSend = true
-                    if (mIsFirst) {
-                        mHandler.postDelayed(
-                            {
-                                sendBroadcast(Intent().setAction(Cactus.CACTUS_FOREGROUND))
-                                block?.let { it(false) }
-                                mIsFirst = false
-                            },
-                            1000
-                        )
-                    } else {
+                    mHandler.postDelayed {
                         sendBroadcast(Intent().setAction(Cactus.CACTUS_FOREGROUND))
                         block?.let { it(false) }
                     }
                 }
             }
+        }
+    }
+
+    private inline fun Handler.postDelayed(crossinline block: () -> Unit) {
+        if (mIsFirst) {
+            postDelayed(
+                {
+                    block()
+                    mIsFirst = false
+                },
+                FIRST_TIME
+            )
+        } else {
+            block()
         }
     }
 }
