@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -132,8 +133,9 @@ internal fun Service.setNotification(
                 .setContentTitle(title)
                 .setContentText(content)
                 .setSmallIcon(smallIcon)
-                .setLargeIcon(BitmapFactory.decodeResource(resources, largeIcon))
+                .setLargeIcon(largeIconBitmap ?: BitmapFactory.decodeResource(resources, largeIcon))
                 .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .build()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //设置渠道
@@ -146,10 +148,25 @@ internal fun Service.setNotification(
         }
         startForeground(serviceId, notification)
         notificationManager.notify(serviceId, notification)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1 && hideNotification && !isHideService) {
-            val intent = Intent(this@setNotification, HideForegroundService::class.java)
-            intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)
-            startService(intent)
+        if (hideNotification) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (notificationManager.getNotificationChannel(channelId) != null) {
+                    Handler(Looper.getMainLooper()).postDelayed(
+                        {
+                            notificationManager.deleteNotificationChannel(channelId)
+                        },
+                        500
+                    )
+                }
+            } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N_MR1) {
+                notificationManager.cancel(serviceId)
+            } else {
+                if (!isHideService) {
+                    val intent = Intent(this@setNotification, HideForegroundService::class.java)
+                    intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)
+                    startService(intent)
+                }
+            }
         }
     }
 }

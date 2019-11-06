@@ -2,6 +2,7 @@ package com.gyf.cactus
 
 import android.app.PendingIntent
 import android.content.Context
+import android.graphics.Bitmap
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.DefaultConfig
 import com.gyf.cactus.entity.NotificationConfig
@@ -78,7 +79,7 @@ class Cactus private constructor() {
     }
 
     /**
-     * 是否隐藏通知栏，只支持sdk N(包含N)以下版本
+     * 是否隐藏通知栏
      * @param hide Boolean
      * @return Cactus
      */
@@ -147,6 +148,15 @@ class Cactus private constructor() {
      */
     fun setLargeIcon(largeIcon: Int) = apply {
         mNotificationConfig.largeIcon = largeIcon
+    }
+
+    /**
+     * 通知栏大图标
+     * @param largeIcon Bitmap
+     * @return Cactus
+     */
+    fun setLargeIcon(largeIcon: Bitmap) = apply {
+        mNotificationConfig.largeIconBitmap = largeIcon
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.gyf.cactus.entity
 
 import android.app.PendingIntent
+import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
 import com.gyf.cactus.R
@@ -41,6 +42,10 @@ data class NotificationConfig(
      */
     var largeIcon: Int = R.drawable.icon_cactus_large,
     /**
+     * 大图标
+     */
+    var largeIconBitmap: Bitmap? = null,
+    /**
      * 是否隐藏通知栏，对于 Android O以下有效
      */
     var hideNotification: Boolean = true,
@@ -57,6 +62,7 @@ data class NotificationConfig(
         source.readString()!!,
         source.readInt(),
         source.readInt(),
+        source.readParcelable<Bitmap>(Bitmap::class.java.classLoader),
         1 == source.readInt(),
         source.readParcelable<PendingIntent>(PendingIntent::class.java.classLoader)
     )
@@ -71,6 +77,7 @@ data class NotificationConfig(
         writeString(content)
         writeInt(smallIcon)
         writeInt(largeIcon)
+        writeParcelable(largeIconBitmap, 0)
         writeInt((if (hideNotification) 1 else 0))
         writeParcelable(pendingIntent, 0)
     }

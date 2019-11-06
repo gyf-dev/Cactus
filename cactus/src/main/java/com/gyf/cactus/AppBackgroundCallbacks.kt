@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import com.gyf.cactus.pix.OnePixActivity
 import java.lang.ref.WeakReference
 
@@ -23,7 +24,7 @@ class AppBackgroundCallbacks @JvmOverloads constructor(
     Application.ActivityLifecycleCallbacks {
 
     private val mHandler by lazy {
-        Handler()
+        Handler(Looper.getMainLooper())
     }
 
     private var mContext: WeakReference<Context>? = null
