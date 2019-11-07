@@ -1,13 +1,14 @@
 ## [点我下载demo](https://www.pgyer.com/1osg)
 
 ##保活效果，仅供参考
+
 | 维度 | android 6.0以下虚拟机 | android 7.1虚拟机 | android 7/8/8.1/9/10虚拟机 | vovo x23 android 9 | 
   | :-------------: |:-------------:| :-------------:| :-------------:| :-------------:|
   | 前台 | 0 | 0 |0 |0 |
   | 后台（优化前） | 6 | 立马死了 |11 |8 |
-  | 后台（优化后） | <font color=red>1</font> | <font color=red>3</font> |<font color=red>3</font> |<font color=red>4</font> |
+  | 后台（优化后） | $\color{#FF6347}{1}$ | $\color{#FF6347}{3}$ |$\color{#FF6347}{3}$ |$\color{#FF6347}{4}$ |
   | 息屏（优化前） | 6 | 立马死了 |11 |9 |
-  | 息屏（优化后） | <font color=red>0</font> | <font color=red>3</font> |<font color=red>3</font> |<font color=red>4</font> |
+  | 息屏（优化后） | $\color{#FF6347}{1}$ | $\color{#FF6347}{3}$ |$\color{#FF6347}{3}$ |$\color{#FF6347}{4}$ |
 
 ## 使用 
 > android studio
