@@ -16,9 +16,9 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.gyf.cactus.callback.AppBackgroundCallback
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.R
+import com.gyf.cactus.callback.AppBackgroundCallback
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.NotificationConfig
 import com.gyf.cactus.pix.OnePixActivity
@@ -129,40 +129,59 @@ internal fun Service.setNotification(
     notificationConfig.apply {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        //构建Notification
         val notification =
-            NotificationCompat.Builder(this@setNotification, channelId)
+            notification ?: NotificationCompat.Builder(this@setNotification, channelId)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setSmallIcon(
                     if (hideNotification && Build.VERSION.SDK_INT != Build.VERSION_CODES.N_MR1)
                         R.drawable.icon_cactus_trans else smallIcon
                 )
-                .setLargeIcon(largeIconBitmap ?: BitmapFactory.decodeResource(resources, largeIcon))
+                .setLargeIcon(
+                    largeIconBitmap ?: BitmapFactory.decodeResource(
+                        resources,
+                        largeIcon
+                    )
+                )
                 .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
+                .apply {
+                    remoteViews?.also {
+                        setContent(it)
+                    }
+                    bigRemoteViews?.also {
+                        setCustomBigContentView(it)
+                    }
+                }
                 .build()
+        //设置渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //设置渠道
-            val channel = NotificationChannel(
-                channelId,
-                notificationConfig.channelName,
-                NotificationManager.IMPORTANCE_NONE
+            notificationManager.createNotificationChannel(
+                notificationChannel ?: NotificationChannel(
+                    notification.channelId,
+                    notificationConfig.channelName,
+                    NotificationManager.IMPORTANCE_NONE
+                )
             )
-            notificationManager.createNotificationChannel(channel)
         }
+        //设置前台服务Notification
         startForeground(serviceId, notification)
+        //更新Notification
         notificationManager.notify(serviceId, notification)
+        //隐藏Notification
         if (hideNotification) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 Handler(Looper.getMainLooper()).postDelayed(
                     {
-                        if (notificationManager.getNotificationChannel(channelId) != null) {
-                            notificationManager.deleteNotificationChannel(channelId)
+                        if (notificationManager.getNotificationChannel(notification.channelId) != null) {
+                            notificationManager.deleteNotificationChannel(notification.channelId)
                         }
                     },
                     500
                 )
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+            } else {
                 if (!isHideService) {
                     val intent = Intent(this@setNotification, HideForegroundService::class.java)
                     intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)

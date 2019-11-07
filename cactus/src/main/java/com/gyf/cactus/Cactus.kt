@@ -1,8 +1,11 @@
 package com.gyf.cactus
 
+import android.app.Notification
+import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
+import android.widget.RemoteViews
 import com.gyf.cactus.callback.CactusBackgroundCallback
 import com.gyf.cactus.callback.CactusCallback
 import com.gyf.cactus.entity.CactusConfig
@@ -63,119 +66,236 @@ class Cactus private constructor() {
     }
 
     /**
-     * 设置通知栏信息
-     * @param notificationConfig NotificationConfig
-     * @return Cactus
+     * 设置notification，非必传，如果不传，将使用用户根据api设置的信息构建Notification
+     *
+     * @param notification Notification
+     * @return WaterBear
      */
-    fun setNotificationConfig(notificationConfig: NotificationConfig) = apply {
-        mNotificationConfig = notificationConfig
+    fun setNotification(notification: Notification) = apply {
+        mNotificationConfig.notification = notification
     }
 
     /**
-     * 设置PendingIntent，用来处理通知栏点击事件
-     * @param pendingIntent PendingIntent
-     * @return Cactus
+     * 设置NotificationChannel，非必传，如果不传，将使用默认的NotificationChannel
+     *
+     * @param notificationChannel NotificationChannel
+     * @return WaterBear
      */
-    fun setPendingIntent(pendingIntent: PendingIntent) = apply {
-        mNotificationConfig.pendingIntent = pendingIntent
+    fun setNotificationChannel(notificationChannel: NotificationChannel) = apply {
+        mNotificationConfig.notificationChannel = notificationChannel
     }
 
     /**
-     * 是否隐藏通知栏，经测试，除了android 7.1手机之外都可以隐藏
+     * 是否隐藏通知栏，经测试，除了android 7.1手机之外都可以隐藏，默认隐藏，非必传
      *
      * @param hide Boolean
-     * @return Cactus
+     * @return WaterBear
      */
     fun hideNotification(hide: Boolean) = apply {
         mNotificationConfig.hideNotification = hide
     }
 
     /**
-     * 服务Id
+     * 设置PendingIntent，用来处理通知栏点击事件，非必传
+     *
+     * @param pendingIntent PendingIntent
+     * @return WaterBear
+     */
+    fun setPendingIntent(pendingIntent: PendingIntent) = apply {
+        mNotificationConfig.pendingIntent = pendingIntent
+    }
+
+    /**
+     * 服务Id，默认是1到Int.MAX_VALUE随机数，非必传
+     *
      * @param serviceId Int
-     * @return Cactus
+     * @return WaterBear
      */
     fun setServiceId(serviceId: Int) = apply {
         mNotificationConfig.serviceId = serviceId
     }
 
     /**
-     * 渠道Id
+     * 渠道Id，默认是WaterBear，建议用户修改，非必传
+     *
      * @param channelId String
-     * @return Cactus
+     * @return WaterBear
      */
     fun setChannelId(channelId: String) = apply {
         mNotificationConfig.channelId = channelId
     }
 
     /**
-     * 渠道名
+     * 渠道名，用于设置里通知渠道展示，默认是WaterBear，建议用户修改，非必传
+     *
      * @param channelName String
-     * @return Cactus
+     * @return WaterBear
      */
     fun setChannelName(channelName: String) = apply {
         mNotificationConfig.channelName = channelName
     }
 
     /**
-     * 通知栏标题
+     * 通知栏标题，默认是WaterBear，建议用户修改，非必传
+     *
      * @param title String
-     * @return Cactus
+     * @return WaterBear
      */
     fun setTitle(title: String) = apply {
         mNotificationConfig.title = title
     }
 
     /**
-     * 通知栏内容
+     * 通知栏内容，默认是WaterBear is running，建议用户修改，非必传
+     *
      * @param content String
-     * @return Cactus
+     * @return WaterBear
      */
     fun setContent(content: String) = apply {
         mNotificationConfig.content = content
     }
 
     /**
-     * 通知栏小图标
+     * 设置RemoteViews（自定义布局），非必传
+     *
+     * @param remoteViews RemoteViews
+     * @return WaterBear
+     */
+    fun setRemoteViews(remoteViews: RemoteViews) = apply {
+        mNotificationConfig.hideNotification = false
+        mNotificationConfig.remoteViews = remoteViews
+    }
+
+    /**
+     * 设置BigRemoteViews（自定义布局），非必传
+     *
+     * @param bigRemoteViews RemoteViews
+     * @return WaterBear
+     */
+    fun setBigRemoteViews(bigRemoteViews: RemoteViews) = apply {
+        mNotificationConfig.hideNotification = false
+        mNotificationConfig.bigRemoteViews = bigRemoteViews
+    }
+
+    /**
+     * 通知栏小图标，默认是库里的图标，建议用户修改，非必传
+     *
      * @param smallIcon Int
-     * @return Cactus
+     * @return WaterBear
      */
     fun setSmallIcon(smallIcon: Int) = apply {
         mNotificationConfig.smallIcon = smallIcon
     }
 
     /**
-     * 通知栏大图标
+     * 通知栏大图标，默认是库里的图标，建议用户修改，非必传
+     *
      * @param largeIcon Int
-     * @return Cactus
+     * @return WaterBear
      */
     fun setLargeIcon(largeIcon: Int) = apply {
         mNotificationConfig.largeIcon = largeIcon
     }
 
     /**
-     * 通知栏大图标
+     * 通知栏大图标，非必传
+     *
      * @param largeIcon Bitmap
-     * @return Cactus
+     * @return WaterBear
      */
     fun setLargeIcon(largeIcon: Bitmap) = apply {
         mNotificationConfig.largeIconBitmap = largeIcon
     }
 
+
     /**
-     * 增加回调
-     * @param cactusCallback CactusCallback
-     * @return Cactus
+     * 是否可以播放音乐，默认可以播放音乐，非必传
+     *
+     * @param enabled Boolean
+     * @return WaterBear
      */
-    fun addCallback(cactusCallback: CactusCallback) = apply {
-        CALLBACKS.add(cactusCallback)
+    fun setMusicEnabled(enabled: Boolean) = apply {
+        mDefaultConfig.musicEnabled = enabled
     }
 
     /**
-     * 增加回调 lambda形式
+     * 后台是否可以播放音乐，默认不可以后台播放音乐，非必传
+     *
+     * @param enabled Boolean
+     * @return WaterBear
+     */
+    fun setBackgroundMusicEnabled(enabled: Boolean) = apply {
+        mDefaultConfig.backgroundMusicEnabled = enabled
+    }
+
+    /**
+     * 设置自定义音乐，默认是无声音乐，非必传
+     *
+     * @param musicId Int
+     * @return WaterBear
+     */
+    fun setMusicId(musicId: Int) = apply {
+        mDefaultConfig.musicId = musicId
+    }
+
+    /**
+     * 设置音乐间隔时间，时间间隔越长，越省电，默认间隔时间是0，非必传
+     *
+     * @param repeatInterval Long
+     * @return WaterBear
+     */
+    fun setMusicInterval(repeatInterval: Long) = apply {
+        if (repeatInterval >= 0L) {
+            mDefaultConfig.repeatInterval = repeatInterval
+        }
+    }
+
+    /**
+     * 是否可以使用一像素，默认可以使用，只有在android p以下可以使用，非必传
+     *
+     * @param enabled Boolean
+     * @return WaterBear
+     */
+    fun setOnePixEnabled(enabled: Boolean) = apply {
+        mDefaultConfig.onePixEnabled = enabled
+    }
+
+    /**
+     * 一像素模式，感觉没啥用，非必传
+     *
+     * @param onePixModel OnePixModel
+     * @return WaterBear
+     */
+    fun setOnePixModel(onePixModel: OnePixModel) = apply {
+        mDefaultConfig.onePixModel = onePixModel
+    }
+
+    /**
+     * 是否Debug模式，默认没有调试信息，非必传
+     *
+     * @param isDebug Boolean
+     * @return WaterBear
+     */
+    fun isDebug(isDebug: Boolean) = apply {
+        mDefaultConfig.debug = isDebug
+    }
+
+    /**
+     * 增加回调，用于处理一些额外的工作，非必传
+     *
+     * @param waterBearCallback CactusCallback
+     * @return Cactus
+     */
+    fun addCallback(waterBearCallback: CactusCallback) = apply {
+        CALLBACKS.add(waterBearCallback)
+    }
+
+    /**
+     * 增加回调，lambda形式，用于处理一些额外的工作，非必传
+     *
      * @param stop Function0<Unit>
      * @param work Function1<Int, Unit>
-     * @return Cactus
+     * @return WaterBear
      */
     fun addCallback(stop: (() -> Unit)? = null, work: (Int) -> Unit) = apply {
         CALLBACKS.add(object : CactusCallback {
@@ -192,18 +312,18 @@ class Cactus private constructor() {
     }
 
     /**
-     * 前后台切换回调
+     * 前后台切换回调，用于处理app前后台切换，非必传
      *
-     * @param cactusBackgroundCallback CactusBackgroundCallback
+     * @param waterBearBackgroundCallback CactusBackgroundCallback
      */
-    fun addBackgroundCallback(cactusBackgroundCallback: CactusBackgroundCallback) {
-        BACKGROUND_CALLBACKS.add(cactusBackgroundCallback)
+    fun addBackgroundCallback(waterBearBackgroundCallback: CactusBackgroundCallback) {
+        BACKGROUND_CALLBACKS.add(waterBearBackgroundCallback)
     }
 
     /**
-     * 前后台切换回调
+     * 前后台切换回调，用于处理app前后台切换，非必传
      *
-     * @param block [@kotlin.ExtensionFunctionType] Function1<Boolean, Unit>
+     * @param block Function1<Boolean, Unit>
      */
     fun addBackgroundCallback(block: (Boolean) -> Unit) {
         BACKGROUND_CALLBACKS.add(object : CactusBackgroundCallback {
@@ -211,72 +331,6 @@ class Cactus private constructor() {
                 block(background)
             }
         })
-    }
-
-    /**
-     * 是否可以播放音乐
-     * @param enabled Boolean
-     * @return Cactus
-     */
-    fun setMusicEnabled(enabled: Boolean) = apply {
-        mDefaultConfig.musicEnabled = enabled
-    }
-
-    /**
-     * 后台是否可以播放音乐
-     *
-     * @param enabled Boolean
-     * @return WaterBear
-     */
-    fun setBackgroundMusicEnabled(enabled: Boolean) = apply {
-        mDefaultConfig.backgroundMusicEnabled = enabled
-    }
-
-    /**
-     * 设置自定义音乐
-     * @param musicId Int
-     * @return Cactus
-     */
-    fun setMusicId(musicId: Int) = apply {
-        mDefaultConfig.musicId = musicId
-    }
-
-    /**
-     * 设置音乐间隔时间，时间间隔越长，越省电
-     * @param repeatInterval Long
-     * @return Cactus
-     */
-    fun setMusicInterval(repeatInterval: Long) = apply {
-        if (repeatInterval >= 0L) {
-            mDefaultConfig.repeatInterval = repeatInterval
-        }
-    }
-
-    /**
-     * 是否可以使用一像素
-     * @param enabled Boolean
-     * @return Cactus
-     */
-    fun setOnePixEnabled(enabled: Boolean) = apply {
-        mDefaultConfig.onePixEnabled = enabled
-    }
-
-    /**
-     * 一像素模式，感觉没啥用
-     * @param onePixModel OnePixModel
-     * @return Cactus
-     */
-    fun setOnePixModel(onePixModel: OnePixModel) = apply {
-        mDefaultConfig.onePixModel = onePixModel
-    }
-
-    /**
-     * 是否Debug模式
-     * @param isDebug Boolean
-     * @return Cactus
-     */
-    fun isDebug(isDebug: Boolean) = apply {
-        mDefaultConfig.debug = isDebug
     }
 
     /**

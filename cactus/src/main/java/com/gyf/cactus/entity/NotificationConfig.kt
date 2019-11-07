@@ -1,9 +1,13 @@
 package com.gyf.cactus.entity
 
+import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
+import android.widget.RemoteViews
 import com.gyf.cactus.R
 
 /**
@@ -52,8 +56,25 @@ data class NotificationConfig(
     /**
      * 点击标题栏跳转事件
      */
-    var pendingIntent: PendingIntent? = null
+    var pendingIntent: PendingIntent? = null,
+    /**
+     * 自定义布局
+     */
+    var remoteViews: RemoteViews? = null,
+    /**
+     * 自定义大布局
+     */
+    var bigRemoteViews: RemoteViews? = null,
+    /**
+     * 用户传入的Notification，使用该属性，以上配置就不会生效
+     */
+    var notification: Notification? = null,
+    /**
+     * 用户传入的NotificationChannel
+     */
+    var notificationChannel: NotificationChannel? = null
 ) : Parcelable {
+    @SuppressLint("NewApi")
     constructor(source: Parcel) : this(
         source.readInt(),
         source.readString()!!,
@@ -64,11 +85,16 @@ data class NotificationConfig(
         source.readInt(),
         source.readParcelable<Bitmap>(Bitmap::class.java.classLoader),
         1 == source.readInt(),
-        source.readParcelable<PendingIntent>(PendingIntent::class.java.classLoader)
+        source.readParcelable<PendingIntent>(PendingIntent::class.java.classLoader),
+        source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
+        source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
+        source.readParcelable<Notification>(Notification::class.java.classLoader),
+        source.readParcelable<NotificationChannel>(NotificationChannel::class.java.classLoader)
     )
 
     override fun describeContents() = 0
 
+    @SuppressLint("NewApi")
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeInt(serviceId)
         writeString(channelId)
@@ -80,6 +106,10 @@ data class NotificationConfig(
         writeParcelable(largeIconBitmap, 0)
         writeInt((if (hideNotification) 1 else 0))
         writeParcelable(pendingIntent, 0)
+        writeParcelable(remoteViews, 0)
+        writeParcelable(bigRemoteViews, 0)
+        writeParcelable(notification, 0)
+        writeParcelable(notificationChannel, 0)
     }
 
     companion object {

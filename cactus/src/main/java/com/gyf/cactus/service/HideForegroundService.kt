@@ -15,8 +15,8 @@ import com.gyf.cactus.ext.setNotification
  */
 class HideForegroundService : Service() {
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        intent.getParcelableExtra<NotificationConfig>(Cactus.CACTUS_NOTIFICATION_CONFIG)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        intent?.getParcelableExtra<NotificationConfig>(Cactus.CACTUS_NOTIFICATION_CONFIG)
             ?.let {
                 setNotification(it, true)
             }

@@ -3,7 +3,7 @@
 ## 使用 
 > android studio
    ```groovy
-   implementation 'com.gyf.cactus:cactus:1.1.0-beta02'
+   implementation 'com.gyf.cactus:cactus:1.1.0'
    ```
 
 ## 用法（具体api请参考注释，这里就不一一列出来了）
@@ -36,6 +36,11 @@
    ```
 
 ## 更新说明
+#### 1.1.0
+- 除了android7.1手机都可以隐藏通知栏了
+- 增加一些通知栏相关api，比如可以自定义view了
+- 优化代码
+
 #### 1.0.8
 - 解决设置后台可以播放音乐，奔溃重启后无法继续播放音乐的问题
 

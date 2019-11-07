@@ -11,7 +11,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "$cactus_version"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
