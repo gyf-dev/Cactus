@@ -1,4 +1,4 @@
-package com.gyf.cactus
+package com.gyf.cactus.callback
 
 import android.app.Activity
 import android.app.Application
@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import com.gyf.cactus.Cactus
 import com.gyf.cactus.pix.OnePixActivity
 import java.lang.ref.WeakReference
 
@@ -17,7 +18,7 @@ import java.lang.ref.WeakReference
  * @author geyifeng
  * @date 2019-11-01 10:36
  */
-class AppBackgroundCallbacks @JvmOverloads constructor(
+class AppBackgroundCallback @JvmOverloads constructor(
     private var context: Context? = null,
     private var block: ((Boolean) -> Unit)? = null
 ) :
@@ -29,8 +30,17 @@ class AppBackgroundCallbacks @JvmOverloads constructor(
 
     private var mContext: WeakReference<Context>? = null
 
+    /**
+     * 前台Activity数量
+     */
     private var mFrontActivityCount = 0
+    /**
+     * 当Activity数量大于0的时候，标识是否已经发出前后台广播
+     */
     private var mIsSend = false
+    /**
+     * 是否是第一次发送前后台广播
+     */
     private var mIsFirst = true
 
     companion object {
@@ -77,6 +87,9 @@ class AppBackgroundCallbacks @JvmOverloads constructor(
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
     }
 
+    /**
+     * 处理广播
+     */
     private fun post() {
         (mContext?.get() ?: context)?.apply {
             if (mFrontActivityCount == 0) {

@@ -9,10 +9,8 @@ import android.content.IntentFilter
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
-import com.gyf.cactus.AppBackgroundCallbacks
 import com.gyf.cactus.Cactus
-import com.gyf.cactus.CactusBackgroundCallback
-import com.gyf.cactus.CactusCallback
+import com.gyf.cactus.callback.CactusCallback
 import com.gyf.cactus.ext.cactus
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -79,7 +77,7 @@ class App : Application(), CactusCallback {
             }
         }
         //或者这样设置前后台监听
-//        registerActivityLifecycleCallbacks(AppBackgroundCallbacks {
+//        registerActivityLifecycleCallbacks(AppBackgroundCallback {
 //
 //        })
     }

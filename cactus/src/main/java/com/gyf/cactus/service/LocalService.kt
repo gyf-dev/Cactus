@@ -63,8 +63,15 @@ class LocalService : Service() {
             service?.let {
                 ICactusInterface.Stub.asInterface(it)
                     ?.apply {
-                        wakeup(mCactusConfig)
-                        connectionTimes(++mConnectionTimes)
+                        if (asBinder().isBinderAlive) {
+                            ++mConnectionTimes
+                            try {
+                                wakeup(mCactusConfig)
+                                connectionTimes(mConnectionTimes)
+                            } catch (e: Exception) {
+                                --mConnectionTimes
+                            }
+                        }
                     }
             }
         }
@@ -91,10 +98,15 @@ class LocalService : Service() {
     private fun doWork(times: Int) {
         if (!mIsServiceRunning) {
             mIsServiceRunning = true
-            log("LocalService is run!")
+            log("LocalService is run >>>> do work times = $times")
             registerMedia()
             registerBroadcastReceiver()
-            sendBroadcast(Intent(Cactus.CACTUS_WORK).putExtra(Cactus.CACTUS_TIMES, times))
+            sendBroadcast(
+                Intent(Cactus.CACTUS_WORK).putExtra(
+                    Cactus.CACTUS_TIMES,
+                    times
+                )
+            )
             if (Cactus.CALLBACKS.isNotEmpty()) {
                 Cactus.CALLBACKS.forEach {
                     it.doWork(times)

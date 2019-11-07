@@ -40,8 +40,15 @@ class RemoteService : Service() {
             service?.let {
                 ICactusInterface.Stub.asInterface(it)
                     ?.apply {
-                        wakeup(mCactusConfig)
-                        connectionTimes(++mConnectionTimes)
+                        if (asBinder().isBinderAlive) {
+                            ++mConnectionTimes
+                            try {
+                                wakeup(mCactusConfig)
+                                connectionTimes(mConnectionTimes)
+                            } catch (e: Exception) {
+                                --mConnectionTimes
+                            }
+                        }
                     }
             }
         }

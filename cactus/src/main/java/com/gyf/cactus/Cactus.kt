@@ -3,6 +3,8 @@ package com.gyf.cactus
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
+import com.gyf.cactus.callback.CactusBackgroundCallback
+import com.gyf.cactus.callback.CactusCallback
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.DefaultConfig
 import com.gyf.cactus.entity.NotificationConfig
@@ -79,7 +81,8 @@ class Cactus private constructor() {
     }
 
     /**
-     * 是否隐藏通知栏
+     * 是否隐藏通知栏，经测试，除了android 7.1手机之外都可以隐藏
+     *
      * @param hide Boolean
      * @return Cactus
      */

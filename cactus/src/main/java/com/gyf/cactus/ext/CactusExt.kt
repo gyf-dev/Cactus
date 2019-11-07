@@ -16,8 +16,9 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.gyf.cactus.AppBackgroundCallbacks
+import com.gyf.cactus.callback.AppBackgroundCallback
 import com.gyf.cactus.Cactus
+import com.gyf.cactus.R
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.NotificationConfig
 import com.gyf.cactus.pix.OnePixActivity
@@ -66,7 +67,7 @@ internal fun Context.register(cactusConfig: CactusConfig) {
             registerCactus(cactusConfig)
         }
         if (this is Application) {
-            registerActivityLifecycleCallbacks(AppBackgroundCallbacks(this))
+            registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
         }
     }
 }
@@ -132,7 +133,10 @@ internal fun Service.setNotification(
             NotificationCompat.Builder(this@setNotification, channelId)
                 .setContentTitle(title)
                 .setContentText(content)
-                .setSmallIcon(smallIcon)
+                .setSmallIcon(
+                    if (hideNotification && Build.VERSION.SDK_INT != Build.VERSION_CODES.N_MR1)
+                        R.drawable.icon_cactus_trans else smallIcon
+                )
                 .setLargeIcon(largeIconBitmap ?: BitmapFactory.decodeResource(resources, largeIcon))
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
@@ -150,17 +154,15 @@ internal fun Service.setNotification(
         notificationManager.notify(serviceId, notification)
         if (hideNotification) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (notificationManager.getNotificationChannel(channelId) != null) {
-                    Handler(Looper.getMainLooper()).postDelayed(
-                        {
+                Handler(Looper.getMainLooper()).postDelayed(
+                    {
+                        if (notificationManager.getNotificationChannel(channelId) != null) {
                             notificationManager.deleteNotificationChannel(channelId)
-                        },
-                        500
-                    )
-                }
-            } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N_MR1) {
-                notificationManager.cancel(serviceId)
-            } else {
+                        }
+                    },
+                    500
+                )
+            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
                 if (!isHideService) {
                     val intent = Intent(this@setNotification, HideForegroundService::class.java)
                     intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)
