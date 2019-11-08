@@ -21,6 +21,7 @@ import com.gyf.cactus.R
 import com.gyf.cactus.callback.AppBackgroundCallback
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.NotificationConfig
+import com.gyf.cactus.exception.CactusException
 import com.gyf.cactus.pix.OnePixActivity
 import com.gyf.cactus.service.CactusJobService
 import com.gyf.cactus.service.HideForegroundService
@@ -159,7 +160,19 @@ internal fun Service.setNotification(
         //设置渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.createNotificationChannel(
-                notificationChannel ?: NotificationChannel(
+                if (notificationChannel is NotificationChannel) {
+                    (notificationChannel as NotificationChannel?)?.apply {
+                        if (id != notification.channelId) {
+                            throw CactusException(
+                                "保证渠道相同(The id of the NotificationChannel " +
+                                        "is different from the channel of the Notification.)"
+                            )
+                        }
+                    }
+                    notificationChannel as NotificationChannel?
+                } else {
+                    null
+                } ?: NotificationChannel(
                     notification.channelId,
                     notificationConfig.channelName,
                     NotificationManager.IMPORTANCE_NONE
@@ -179,9 +192,9 @@ internal fun Service.setNotification(
                             notificationManager.deleteNotificationChannel(notification.channelId)
                         }
                     },
-                    500
+                    1000
                 )
-            } else {
+            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
                 if (!isHideService) {
                     val intent = Intent(this@setNotification, HideForegroundService::class.java)
                     intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)

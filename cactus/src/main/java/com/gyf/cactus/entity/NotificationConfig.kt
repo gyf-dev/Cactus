@@ -72,7 +72,7 @@ data class NotificationConfig(
     /**
      * 用户传入的NotificationChannel
      */
-    var notificationChannel: NotificationChannel? = null
+    var notificationChannel: Parcelable? = null
 ) : Parcelable {
     @SuppressLint("NewApi")
     constructor(source: Parcel) : this(
@@ -89,7 +89,7 @@ data class NotificationConfig(
         source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
         source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
         source.readParcelable<Notification>(Notification::class.java.classLoader),
-        source.readParcelable<NotificationChannel>(NotificationChannel::class.java.classLoader)
+        source.readParcelable<Parcelable>(Parcelable::class.java.classLoader)
     )
 
     override fun describeContents() = 0

@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
 import android.widget.RemoteViews
 import com.gyf.cactus.callback.CactusBackgroundCallback
 import com.gyf.cactus.callback.CactusCallback
@@ -82,7 +83,9 @@ class Cactus private constructor() {
      * @return WaterBear
      */
     fun setNotificationChannel(notificationChannel: NotificationChannel) = apply {
-        mNotificationConfig.notificationChannel = notificationChannel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mNotificationConfig.notificationChannel = notificationChannel
+        }
     }
 
     /**

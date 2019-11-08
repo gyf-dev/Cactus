@@ -3,7 +3,7 @@
 ## 使用 
 > android studio
    ```groovy
-   implementation 'com.gyf.cactus:cactus:1.1.0'
+   implementation 'com.gyf.cactus:cactus:1.1.1'
    ```
 
 ## 用法（具体api请参考注释，这里就不一一列出来了）
@@ -60,6 +60,9 @@
   | 16 | 预留的最低级别，一般对于缓存的进程才有可能设置成这个级别 |  | |
 
 ## 更新说明
+#### 1.1.1
+- 重点：修复1.1.0版本由于新增设置渠道api(setNotificationChannel)忘记做渠道判断，导致在8.0以下手机奔溃，1.0.8版本不受影响
+
 #### 1.1.0
 - 除了android7.1手机都可以隐藏通知栏了
 - 增加一些通知栏相关api，比如可以自定义view了
