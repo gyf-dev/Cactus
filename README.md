@@ -34,6 +34,10 @@
        })
     }
    ```
+## 混淆规则(proguard-rules.pro)
+   ```
+    -keep class com.gyf.cactus.entity.* {*;} 
+   ```
 
 ## 保活效果，仅供参考
   | 维度 | android 6.0以下虚拟机 | android 7.1虚拟机 | android 7/8/8.1/9/10虚拟机 | vovo x23 android 9 | 
