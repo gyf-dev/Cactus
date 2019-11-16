@@ -6,8 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import com.gyf.cactus.Cactus
+import com.gyf.cactus.ext.mMainHandler
 import com.gyf.cactus.pix.OnePixActivity
 import java.lang.ref.WeakReference
 
@@ -23,10 +23,6 @@ class AppBackgroundCallback @JvmOverloads constructor(
     private var block: ((Boolean) -> Unit)? = null
 ) :
     Application.ActivityLifecycleCallbacks {
-
-    private val mHandler by lazy {
-        Handler(Looper.getMainLooper())
-    }
 
     private var mContext: WeakReference<Context>? = null
 
@@ -48,7 +44,7 @@ class AppBackgroundCallback @JvmOverloads constructor(
     }
 
     init {
-        mHandler.postDelayed({
+        mMainHandler.postDelayed({
             if (mFrontActivityCount == 0) {
                 post()
             }
@@ -94,14 +90,14 @@ class AppBackgroundCallback @JvmOverloads constructor(
         (mContext?.get() ?: context)?.apply {
             if (mFrontActivityCount == 0) {
                 mIsSend = false
-                mHandler.postDelayed {
+                mMainHandler.postDelayed {
                     sendBroadcast(Intent().setAction(Cactus.CACTUS_BACKGROUND))
                     block?.let { it(true) }
                 }
             } else {
                 if (!mIsSend) {
                     mIsSend = true
-                    mHandler.postDelayed {
+                    mMainHandler.postDelayed {
                         sendBroadcast(Intent().setAction(Cactus.CACTUS_FOREGROUND))
                         block?.let { it(false) }
                     }

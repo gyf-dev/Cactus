@@ -48,6 +48,10 @@ data class NotificationConfig(
      */
     var largeIconBitmap: Bitmap? = null,
     /**
+     * 是否隐藏 Android O以上通知栏
+     */
+    var hideNotificationAfterO: Boolean = true,
+    /**
      * 是否隐藏通知栏，对于 Android O以下有效
      */
     var hideNotification: Boolean = true,
@@ -77,13 +81,14 @@ data class NotificationConfig(
 ) : Parcelable {
     constructor(source: Parcel) : this(
         source.readInt(),
-        source.readString()!!,
-        source.readString()!!,
-        source.readString()!!,
-        source.readString()!!,
+        source.readString() ?: "Cactus",
+        source.readString() ?: "Cactus",
+        source.readString() ?: "Cactus",
+        source.readString() ?: "The app of cactus is running",
         source.readInt(),
         source.readInt(),
         source.readParcelable<Bitmap>(Bitmap::class.java.classLoader),
+        1 == source.readInt(),
         1 == source.readInt(),
         source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
         source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
@@ -103,6 +108,7 @@ data class NotificationConfig(
         writeInt(smallIcon)
         writeInt(largeIcon)
         writeParcelable(largeIconBitmap, 0)
+        writeInt((if (hideNotificationAfterO) 1 else 0))
         writeInt((if (hideNotification) 1 else 0))
         writeParcelable(remoteViews, 0)
         writeParcelable(bigRemoteViews, 0)

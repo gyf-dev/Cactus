@@ -3,9 +3,7 @@ package com.gyf.cactus.service
 import android.app.Service
 import android.content.*
 import android.media.MediaPlayer
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.util.Log
 import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
@@ -49,8 +47,6 @@ class LocalService : Service() {
      * 服务连接次数
      */
     private var mConnectionTimes = 0
-
-    private val mHandler = Handler(Looper.getMainLooper())
 
     private lateinit var mLocalBinder: LocalBinder
 
@@ -197,7 +193,7 @@ class LocalService : Service() {
      */
     private fun openOnePix() {
         if (mCactusConfig.defaultConfig.onePixEnabled) {
-            mHandler.postDelayed({ startOnePixActivity() }, 1000)
+            mMainHandler.postDelayed({ startOnePixActivity() }, 1000)
         }
     }
 
@@ -253,7 +249,7 @@ class LocalService : Service() {
                     setVolume(0f, 0f)
                 }
                 setOnCompletionListener {
-                    mHandler.postDelayed(
+                    mMainHandler.postDelayed(
                         {
                             mIsMusicRunning = false
                             playMusic()

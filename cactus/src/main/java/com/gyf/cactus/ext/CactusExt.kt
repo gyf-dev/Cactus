@@ -5,27 +5,21 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.gyf.cactus.Cactus
-import com.gyf.cactus.R
 import com.gyf.cactus.callback.AppBackgroundCallback
 import com.gyf.cactus.entity.CactusConfig
-import com.gyf.cactus.entity.NotificationConfig
-import com.gyf.cactus.exception.CactusException
 import com.gyf.cactus.pix.OnePixActivity
 import com.gyf.cactus.service.CactusJobService
-import com.gyf.cactus.service.HideForegroundService
 import com.gyf.cactus.service.LocalService
 import com.gyf.cactus.service.RemoteService
 import com.gyf.cactus.workmanager.CactusWorker
@@ -48,13 +42,9 @@ private var mWeakReference: WeakReference<Activity>? = null
  */
 private var mIsForeground = false
 /**
- * 是否已经有Notification
- */
-private val mHasNotification = mutableMapOf<String, Boolean>()
-/**
  * Handler
  */
-private val mHandler by lazy {
+internal val mMainHandler by lazy {
     Handler(Looper.getMainLooper())
 }
 
@@ -98,7 +88,7 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, LocalService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
     startInternService(intent)
-    mHandler.postDelayed({ registerWorker() }, 5000)
+    mMainHandler.postDelayed({ registerWorker() }, 5000)
 }
 
 /**
@@ -124,94 +114,6 @@ internal fun Context.registerWorker() {
         .addTag(Cactus.CACTUS_TAG)
         .build()
     WorkManager.getInstance(this).enqueue(workRequest)
-}
-
-/**
- * 设置通知栏信息
- * @receiver Service
- * @param notificationConfig NotificationConfig
- */
-internal fun Service.setNotification(
-    notificationConfig: NotificationConfig,
-    isHideService: Boolean = false
-) {
-    val hasNotification = mHasNotification[this@setNotification.toString()]
-    if (hasNotification == null || !hasNotification) {
-        mHasNotification[this@setNotification.toString()] = true
-        notificationConfig.apply {
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            //构建Notification
-            val notification =
-                notification ?: NotificationCompat.Builder(this@setNotification, channelId)
-                    .setContentTitle(title)
-                    .setContentText(content)
-                    .setSmallIcon(
-                        if (hideNotification && Build.VERSION.SDK_INT != Build.VERSION_CODES.N_MR1)
-                            R.drawable.icon_cactus_trans else smallIcon
-                    )
-                    .setLargeIcon(
-                        largeIconBitmap ?: BitmapFactory.decodeResource(
-                            resources,
-                            largeIcon
-                        )
-                    )
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true)
-                    .setPriority(NotificationCompat.PRIORITY_MIN)
-                    .apply {
-                        remoteViews?.also {
-                            setContent(it)
-                        }
-                        bigRemoteViews?.also {
-                            setCustomBigContentView(it)
-                        }
-                    }
-                    .build()
-            //设置渠道
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notificationManager.createNotificationChannel(
-                    if (notificationChannel is NotificationChannel) {
-                        (notificationChannel as NotificationChannel?)?.apply {
-                            if (id != notification.channelId) {
-                                throw CactusException(
-                                    "保证渠道相同(The id of the NotificationChannel " +
-                                            "is different from the channel of the Notification.)"
-                                )
-                            }
-                        }
-                        notificationChannel as NotificationChannel?
-                    } else {
-                        null
-                    } ?: NotificationChannel(
-                        notification.channelId,
-                        notificationConfig.channelName,
-                        NotificationManager.IMPORTANCE_NONE
-                    )
-                )
-            }
-            //设置前台服务Notification
-            startForeground(serviceId, notification)
-            //更新Notification
-            notificationManager.notify(serviceId, notification)
-            //隐藏Notification
-            if (hideNotification) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    mHandler.post {
-                        if (notificationManager.getNotificationChannel(notification.channelId) != null) {
-                            notificationManager.deleteNotificationChannel(notification.channelId)
-                        }
-                    }
-                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
-                    if (!isHideService) {
-                        val intent = Intent(this@setNotification, HideForegroundService::class.java)
-                        intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)
-                        startInternService(intent)
-                    }
-                }
-            }
-        }
-    }
 }
 
 /**
@@ -258,7 +160,7 @@ internal fun Service.startLocalService(
  * @receiver Context
  * @param intent Intent
  */
-private fun Context.startInternService(intent: Intent) {
+internal fun Context.startInternService(intent: Intent) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         startForegroundService(intent)
     } else {

@@ -100,6 +100,16 @@ class Cactus private constructor() {
     }
 
     /**
+     * 是否隐藏Android 8.0以上通知栏
+     *
+     * @param hide Boolean
+     * @return WaterBear
+     */
+    fun hideNotificationAfterO(hide: Boolean) = apply {
+        mNotificationConfig.hideNotificationAfterO = hide
+    }
+
+    /**
      * 设置PendingIntent，用来处理通知栏点击事件，非必传
      *
      * @param pendingIntent PendingIntent
