@@ -59,6 +59,7 @@ class Cactus private constructor() {
         internal const val CACTUS_TAG = "cactus"
         internal const val CACTUS_CONFIG = "cactusConfig"
         internal const val CACTUS_NOTIFICATION_CONFIG = "notificationConfig"
+        internal const val CACTUS_SERVICE_ID = "serviceId"
         internal val CALLBACKS = arrayListOf<CactusCallback>()
         internal val BACKGROUND_CALLBACKS = arrayListOf<CactusBackgroundCallback>()
         private var mCactusConfig = CactusConfig()

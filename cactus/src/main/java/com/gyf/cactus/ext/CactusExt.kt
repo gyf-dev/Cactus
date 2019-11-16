@@ -73,14 +73,18 @@ fun Context.cactus(block: Cactus.() -> Unit) =
  */
 internal fun Context.register(cactusConfig: CactusConfig) {
     if (isMain) {
-        saveConfig(cactusConfig)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            registerJobCactus(cactusConfig)
-        } else {
-            registerCactus(cactusConfig)
-        }
-        if (this is Application) {
-            registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
+        try {
+            saveConfig(cactusConfig)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                registerJobCactus(cactusConfig)
+            } else {
+                registerCactus(cactusConfig)
+            }
+            if (this is Application) {
+                registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
+            }
+        } catch (e: Exception) {
+            Log.d(Cactus.CACTUS_TAG, "Unable to open cactus service!!")
         }
     }
 }
@@ -291,8 +295,16 @@ internal fun Context.startOnePixActivity() {
  * @param cactusConfig CactusConfig
  */
 private fun Context.saveConfig(cactusConfig: CactusConfig) {
-    getSharedPreferences(Cactus.CACTUS_TAG, Context.MODE_PRIVATE).edit()
-        .putString(Cactus.CACTUS_TAG, Gson().toJson(cactusConfig)).apply()
+    val serviceId = getServiceId()
+    if (serviceId > 0) {
+        cactusConfig.notificationConfig.serviceId = serviceId
+    }
+    getSharedPreferences(Cactus.CACTUS_TAG, Context.MODE_PRIVATE).edit().apply {
+        putString(Cactus.CACTUS_CONFIG, Gson().toJson(cactusConfig))
+        if (serviceId <= 0) {
+            putInt(Cactus.CACTUS_SERVICE_ID, cactusConfig.notificationConfig.serviceId)
+        }
+    }.apply()
 }
 
 /**
@@ -304,9 +316,20 @@ private fun Context.saveConfig(cactusConfig: CactusConfig) {
 internal fun Context.getConfig() = getSharedPreferences(
     Cactus.CACTUS_TAG,
     Context.MODE_PRIVATE
-).getString(Cactus.CACTUS_TAG, null)?.run {
+).getString(Cactus.CACTUS_CONFIG, null)?.run {
     Gson().fromJson(this, CactusConfig::class.java)
 } ?: CactusConfig()
+
+/**
+ * 获得serviceId
+ *
+ * @receiver Context
+ * @return Int
+ */
+private fun Context.getServiceId() = getSharedPreferences(
+    Cactus.CACTUS_TAG,
+    Context.MODE_PRIVATE
+).getInt(Cactus.CACTUS_SERVICE_ID, -1)
 
 /**
  * 销毁一像素

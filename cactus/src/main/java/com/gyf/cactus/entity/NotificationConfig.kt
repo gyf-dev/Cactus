@@ -1,8 +1,6 @@
 package com.gyf.cactus.entity
 
-import android.annotation.SuppressLint
 import android.app.Notification
-import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.graphics.Bitmap
 import android.os.Parcel
@@ -54,10 +52,6 @@ data class NotificationConfig(
      */
     var hideNotification: Boolean = true,
     /**
-     * 点击标题栏跳转事件
-     */
-    var pendingIntent: PendingIntent? = null,
-    /**
      * 自定义布局
      */
     var remoteViews: RemoteViews? = null,
@@ -66,15 +60,21 @@ data class NotificationConfig(
      */
     var bigRemoteViews: RemoteViews? = null,
     /**
+     * 点击标题栏跳转事件
+     */
+    @Transient
+    var pendingIntent: PendingIntent? = null,
+    /**
      * 用户传入的Notification，使用该属性，以上配置就不会生效
      */
+    @Transient
     var notification: Notification? = null,
     /**
      * 用户传入的NotificationChannel
      */
+    @Transient
     var notificationChannel: Parcelable? = null
 ) : Parcelable {
-    @SuppressLint("NewApi")
     constructor(source: Parcel) : this(
         source.readInt(),
         source.readString()!!,
@@ -85,16 +85,15 @@ data class NotificationConfig(
         source.readInt(),
         source.readParcelable<Bitmap>(Bitmap::class.java.classLoader),
         1 == source.readInt(),
+        source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
+        source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
         source.readParcelable<PendingIntent>(PendingIntent::class.java.classLoader),
-        source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
-        source.readParcelable<RemoteViews>(RemoteViews::class.java.classLoader),
         source.readParcelable<Notification>(Notification::class.java.classLoader),
         source.readParcelable<Parcelable>(Parcelable::class.java.classLoader)
     )
 
     override fun describeContents() = 0
 
-    @SuppressLint("NewApi")
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeInt(serviceId)
         writeString(channelId)
@@ -105,9 +104,9 @@ data class NotificationConfig(
         writeInt(largeIcon)
         writeParcelable(largeIconBitmap, 0)
         writeInt((if (hideNotification) 1 else 0))
-        writeParcelable(pendingIntent, 0)
         writeParcelable(remoteViews, 0)
         writeParcelable(bigRemoteViews, 0)
+        writeParcelable(pendingIntent, 0)
         writeParcelable(notification, 0)
         writeParcelable(notificationChannel, 0)
     }
