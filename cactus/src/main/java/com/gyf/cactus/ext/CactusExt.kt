@@ -190,9 +190,6 @@ internal fun Service.setNotification(
                     )
                 )
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                notificationManager.shouldHideSilentStatusBarIcons()
-            }
             //设置前台服务Notification
             startForeground(serviceId, notification)
             //更新Notification
