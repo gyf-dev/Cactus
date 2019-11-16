@@ -16,6 +16,7 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.google.gson.Gson
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.R
 import com.gyf.cactus.callback.AppBackgroundCallback
@@ -46,6 +47,16 @@ private var mWeakReference: WeakReference<Activity>? = null
  * 用来表示是前台还是后台
  */
 private var mIsForeground = false
+/**
+ * 是否已经有Notification
+ */
+private val mHasNotification = mutableMapOf<String, Boolean>()
+/**
+ * Handler
+ */
+private val mHandler by lazy {
+    Handler(Looper.getMainLooper())
+}
 
 /**
  * kotlin里使用Cactus
@@ -62,6 +73,7 @@ fun Context.cactus(block: Cactus.() -> Unit) =
  */
 internal fun Context.register(cactusConfig: CactusConfig) {
     if (isMain) {
+        saveConfig(cactusConfig)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             registerJobCactus(cactusConfig)
         } else {
@@ -81,12 +93,8 @@ internal fun Context.register(cactusConfig: CactusConfig) {
 internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, LocalService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        startForegroundService(intent)
-    } else {
-        startService(intent)
-    }
-    Handler().postDelayed({ registerWorker() }, 5000)
+    startInternService(intent)
+    mHandler.postDelayed({ registerWorker() }, 5000)
 }
 
 /**
@@ -97,11 +105,7 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
 internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, CactusJobService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        startForegroundService(intent)
-    } else {
-        startService(intent)
-    }
+    startInternService(intent)
 }
 
 /**
@@ -127,78 +131,82 @@ internal fun Service.setNotification(
     notificationConfig: NotificationConfig,
     isHideService: Boolean = false
 ) {
-    notificationConfig.apply {
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        //构建Notification
-        val notification =
-            notification ?: NotificationCompat.Builder(this@setNotification, channelId)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setSmallIcon(
-                    if (hideNotification && Build.VERSION.SDK_INT != Build.VERSION_CODES.N_MR1)
-                        R.drawable.icon_cactus_trans else smallIcon
-                )
-                .setLargeIcon(
-                    largeIconBitmap ?: BitmapFactory.decodeResource(
-                        resources,
-                        largeIcon
+    val hasNotification = mHasNotification[this@setNotification.toString()]
+    if (hasNotification == null || !hasNotification) {
+        mHasNotification[this@setNotification.toString()] = true
+        notificationConfig.apply {
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            //构建Notification
+            val notification =
+                notification ?: NotificationCompat.Builder(this@setNotification, channelId)
+                    .setContentTitle(title)
+                    .setContentText(content)
+                    .setSmallIcon(
+                        if (hideNotification && Build.VERSION.SDK_INT != Build.VERSION_CODES.N_MR1)
+                            R.drawable.icon_cactus_trans else smallIcon
                     )
-                )
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .apply {
-                    remoteViews?.also {
-                        setContent(it)
-                    }
-                    bigRemoteViews?.also {
-                        setCustomBigContentView(it)
-                    }
-                }
-                .build()
-        //设置渠道
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(
-                if (notificationChannel is NotificationChannel) {
-                    (notificationChannel as NotificationChannel?)?.apply {
-                        if (id != notification.channelId) {
-                            throw CactusException(
-                                "保证渠道相同(The id of the NotificationChannel " +
-                                        "is different from the channel of the Notification.)"
-                            )
+                    .setLargeIcon(
+                        largeIconBitmap ?: BitmapFactory.decodeResource(
+                            resources,
+                            largeIcon
+                        )
+                    )
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .setPriority(NotificationCompat.PRIORITY_MIN)
+                    .apply {
+                        remoteViews?.also {
+                            setContent(it)
+                        }
+                        bigRemoteViews?.also {
+                            setCustomBigContentView(it)
                         }
                     }
-                    notificationChannel as NotificationChannel?
-                } else {
-                    null
-                } ?: NotificationChannel(
-                    notification.channelId,
-                    notificationConfig.channelName,
-                    NotificationManager.IMPORTANCE_NONE
-                )
-            )
-        }
-        //设置前台服务Notification
-        startForeground(serviceId, notification)
-        //更新Notification
-        notificationManager.notify(serviceId, notification)
-        //隐藏Notification
-        if (hideNotification) {
+                    .build()
+            //设置渠道
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Handler(Looper.getMainLooper()).postDelayed(
-                    {
+                notificationManager.createNotificationChannel(
+                    if (notificationChannel is NotificationChannel) {
+                        (notificationChannel as NotificationChannel?)?.apply {
+                            if (id != notification.channelId) {
+                                throw CactusException(
+                                    "保证渠道相同(The id of the NotificationChannel " +
+                                            "is different from the channel of the Notification.)"
+                                )
+                            }
+                        }
+                        notificationChannel as NotificationChannel?
+                    } else {
+                        null
+                    } ?: NotificationChannel(
+                        notification.channelId,
+                        notificationConfig.channelName,
+                        NotificationManager.IMPORTANCE_NONE
+                    )
+                )
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                notificationManager.shouldHideSilentStatusBarIcons()
+            }
+            //设置前台服务Notification
+            startForeground(serviceId, notification)
+            //更新Notification
+            notificationManager.notify(serviceId, notification)
+            //隐藏Notification
+            if (hideNotification) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    mHandler.post {
                         if (notificationManager.getNotificationChannel(notification.channelId) != null) {
                             notificationManager.deleteNotificationChannel(notification.channelId)
                         }
-                    },
-                    1000
-                )
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
-                if (!isHideService) {
-                    val intent = Intent(this@setNotification, HideForegroundService::class.java)
-                    intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)
-                    startService(intent)
+                    }
+                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+                    if (!isHideService) {
+                        val intent = Intent(this@setNotification, HideForegroundService::class.java)
+                        intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)
+                        startInternService(intent)
+                    }
                 }
             }
         }
@@ -217,11 +225,7 @@ internal fun Service.startRemoteService(
 ) {
     val intent = Intent(this, RemoteService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        startForegroundService(intent)
-    } else {
-        startService(intent)
-    }
+    startInternService(intent)
     bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
 }
 
@@ -242,22 +246,22 @@ internal fun Service.startLocalService(
         intent.putExtra(Cactus.CACTUS_CONFIG, it)
     }
     if (isStart) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        startInternService(intent)
     }
     bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
 }
 
 /**
- * 保存一像素，方便销毁
- * @receiver OnePixActivity
+ * 开启Service
+ *
+ * @receiver Context
+ * @param intent Intent
  */
-internal fun OnePixActivity.setOnePix() {
-    if (mWeakReference == null) {
-        mWeakReference = WeakReference(this)
+private fun Context.startInternService(intent: Intent) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        startForegroundService(intent)
+    } else {
+        startService(intent)
     }
 }
 
@@ -281,6 +285,30 @@ internal fun Context.startOnePixActivity() {
 }
 
 /**
+ * 保存配置信息
+ *
+ * @receiver Context
+ * @param cactusConfig CactusConfig
+ */
+private fun Context.saveConfig(cactusConfig: CactusConfig) {
+    getSharedPreferences(Cactus.CACTUS_TAG, Context.MODE_PRIVATE).edit()
+        .putString(Cactus.CACTUS_TAG, Gson().toJson(cactusConfig)).apply()
+}
+
+/**
+ * 获取配置信息
+ *
+ * @receiver Context
+ * @return CactusConfig
+ */
+internal fun Context.getConfig() = getSharedPreferences(
+    Cactus.CACTUS_TAG,
+    Context.MODE_PRIVATE
+).getString(Cactus.CACTUS_TAG, null)?.run {
+    Gson().fromJson(this, CactusConfig::class.java)
+} ?: CactusConfig()
+
+/**
  * 销毁一像素
  */
 internal fun finishOnePix() {
@@ -289,6 +317,16 @@ internal fun finishOnePix() {
             finish()
         }
         mWeakReference = null
+    }
+}
+
+/**
+ * 保存一像素，方便销毁
+ * @receiver OnePixActivity
+ */
+internal fun OnePixActivity.setOnePix() {
+    if (mWeakReference == null) {
+        mWeakReference = WeakReference(this)
     }
 }
 

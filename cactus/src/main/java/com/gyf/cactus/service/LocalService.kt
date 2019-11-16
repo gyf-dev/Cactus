@@ -24,7 +24,7 @@ class LocalService : Service() {
     /**
      * 配置信息
      */
-    private var mCactusConfig = CactusConfig()
+    private lateinit var mCactusConfig: CactusConfig
     /**
      * 音乐播放器
      */
@@ -75,6 +75,11 @@ class LocalService : Service() {
                     }
             }
         }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        mCactusConfig = getConfig()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

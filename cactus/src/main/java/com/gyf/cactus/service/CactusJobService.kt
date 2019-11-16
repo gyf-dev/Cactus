@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.ext.getConfig
 import com.gyf.cactus.ext.isServiceRunning
 import com.gyf.cactus.ext.registerCactus
 import com.gyf.cactus.ext.setNotification
@@ -24,9 +25,14 @@ import com.gyf.cactus.ext.setNotification
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 class CactusJobService : JobService() {
 
-    private var mCactusConfig = CactusConfig()
+    private lateinit var mCactusConfig: CactusConfig
 
     private val jobId = 100
+
+    override fun onCreate() {
+        super.onCreate()
+        mCactusConfig = getConfig()
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {

@@ -9,11 +9,13 @@ import android.util.Log
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.ICactusInterface
+import com.gyf.cactus.ext.getConfig
 import com.gyf.cactus.ext.setNotification
 import com.gyf.cactus.ext.startLocalService
 
 /**
  * 远程服务
+ *
  * @author geyifeng
  * @date 2019-08-28 17:05
  */
@@ -52,6 +54,11 @@ class RemoteService : Service() {
                     }
             }
         }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        mCactusConfig = getConfig()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

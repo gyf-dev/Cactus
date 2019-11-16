@@ -61,7 +61,7 @@ class Cactus private constructor() {
         internal const val CACTUS_NOTIFICATION_CONFIG = "notificationConfig"
         internal val CALLBACKS = arrayListOf<CactusCallback>()
         internal val BACKGROUND_CALLBACKS = arrayListOf<CactusBackgroundCallback>()
-        internal var mCactusConfig = CactusConfig()
+        private var mCactusConfig = CactusConfig()
         @JvmStatic
         val instance by lazy { Cactus() }
     }
@@ -338,6 +338,7 @@ class Cactus private constructor() {
 
     /**
      * 必须调用，建议在Application里初始化，使用Kotlin扩展函数不需要调用此方法
+     *
      * @param context Context
      */
     fun register(context: Context) {
