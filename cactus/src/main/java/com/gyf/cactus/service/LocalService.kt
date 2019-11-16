@@ -29,9 +29,9 @@ class LocalService : Service() {
     private var mMediaPlayer: MediaPlayer? = null
 
     /**
-     * 一像素广播
+     * 广播
      */
-    private val mScreenOnOffReceiver = ScreenOnOffReceiver()
+    private val mServiceReceiver = ServiceReceiver()
 
     /**
      * Service是否在运行
@@ -128,7 +128,7 @@ class LocalService : Service() {
                 it.onStop()
             }
         }
-        unregisterReceiver(mScreenOnOffReceiver)
+        unregisterReceiver(mServiceReceiver)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -152,7 +152,7 @@ class LocalService : Service() {
     /**
      * 屏幕息屏亮屏与前后台切换广播
      */
-    inner class ScreenOnOffReceiver : BroadcastReceiver() {
+    inner class ServiceReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.action?.apply {
@@ -228,7 +228,7 @@ class LocalService : Service() {
      * 注册息屏亮屏广播监听
      */
     private fun registerBroadcastReceiver() {
-        registerReceiver(mScreenOnOffReceiver, IntentFilter().apply {
+        registerReceiver(mServiceReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Cactus.CACTUS_BACKGROUND)

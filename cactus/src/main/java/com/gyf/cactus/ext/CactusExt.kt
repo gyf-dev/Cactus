@@ -42,7 +42,7 @@ private var mWeakReference: WeakReference<Activity>? = null
  */
 private var mIsForeground = false
 /**
- * Handler
+ * 主Handler
  */
 internal val mMainHandler by lazy {
     Handler(Looper.getMainLooper())
