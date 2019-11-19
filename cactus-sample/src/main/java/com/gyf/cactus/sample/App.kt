@@ -78,7 +78,6 @@ class App : Application(), CactusCallback {
             setBackgroundMusicEnabled(true)
             //可选，运行时回调
             addCallback(this@App)
-            hideNotification(false)
             //可选，切后台切换回调
             addBackgroundCallback {
                 Toast.makeText(this@App, if (it) "退到后台啦" else "跑到前台啦", Toast.LENGTH_SHORT).show()

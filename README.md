@@ -3,7 +3,7 @@
 ## 使用 
 > android studio
    ```groovy
-   implementation 'com.gyf.cactus:cactus:1.1.1'
+   implementation 'com.gyf.cactus:cactus:1.1.2'
    ```
 
 ## 用法（具体api请参考注释，这里就不一一列出来了）
@@ -40,7 +40,7 @@
    ```
 
 ## 保活效果，仅供参考(数字代码oom_adj优先级，优先级数字越小越不容易被杀)
-  | 维度 | android 6.0以下虚拟机 | android 7.1虚拟机 | android 7/8/8.1/9/10虚拟机 | vovo x23 android 9 | OnePlus android 9 | 
+  | 维度 | android 6.0以下虚拟机 | android 7.1虚拟机 | android 7/8/8.1/9/10虚拟机 | vovo x23 android 9 | 华为 mate20 /OnePlus (android 9) | 
   | :-------------: |:-------------:| :-------------:| :-------------:| :-------------:|:-------------:|
   | 前台 | 0 | 0 |0 |0 |0 |
   | 后台（优化前） | 6 | 立马死了 |11 |8 |11 |
@@ -60,6 +60,12 @@
   | 16 | 预留的最低级别，一般对于缓存的进程才有可能设置成这个级别 |  | |
 
 ## 更新说明
+#### 1.1.2
+- 增加注销和重启功能
+- 增加判断服务是否是在运行中
+- 增加hideNotificationAfterO方法(是否隐藏Android 8.0以上通知栏)
+- 优化代码
+
 #### 1.1.1
 - 重点：修复1.1.0版本由于新增设置渠道api(setNotificationChannel)忘记做渠道判断，导致在8.0以下手机奔溃，1.0.8版本不受影响
 
