@@ -5,6 +5,7 @@ import android.os.Parcelable
 
 /**
  * 用户配置的信息
+ *
  * @author geyifeng
  * @date 2019-08-29 17:46
  */

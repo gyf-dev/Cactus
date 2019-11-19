@@ -12,7 +12,10 @@ import com.gyf.cactus.callback.CactusCallback
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.DefaultConfig
 import com.gyf.cactus.entity.NotificationConfig
+import com.gyf.cactus.ext.isServiceRunning
 import com.gyf.cactus.ext.register
+import com.gyf.cactus.ext.restart
+import com.gyf.cactus.ext.unregister
 import com.gyf.cactus.pix.OnePixModel
 
 /**
@@ -56,6 +59,10 @@ class Cactus private constructor() {
          * key，通过广播形式获取启动次数
          */
         const val CACTUS_TIMES = "times"
+        /**
+         * 停止标识符
+         */
+        internal const val CACTUS_FLAG_STOP = "com.gyf.cactus.flag.stop"
         internal const val CACTUS_TAG = "cactus"
         internal const val CACTUS_CONFIG = "cactusConfig"
         internal const val CACTUS_NOTIFICATION_CONFIG = "notificationConfig"
@@ -359,4 +366,27 @@ class Cactus private constructor() {
         )
         context.register(mCactusConfig)
     }
+
+    /**
+     * 注销
+     *
+     * @param context Context
+     */
+    fun unregister(context: Context) {
+        context.unregister()
+    }
+
+    /**
+     * 重启
+     *
+     * @param context Context
+     */
+    fun restart(context: Context) {
+        context.restart()
+    }
+
+    /**
+     * 是否在运行
+     */
+    fun isRunning(context: Context) = context.isServiceRunning
 }

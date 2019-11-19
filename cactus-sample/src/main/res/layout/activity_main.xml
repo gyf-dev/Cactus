@@ -89,13 +89,39 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="10dp"
-            android:text="demo里使用了有声音乐，使用setMusicId(R.raw.main)设置，方便演示。sdk默认是无声音乐！"
+            android:text="The audible music is used in the demo, using setMusicId (R.raw.main) settings for presentation. Sdk default is silent music!\n(demo使用了有声音乐，使用setMusicId(R.raw.main)设置，方便演示。sdk默认是无声音乐！)"
             android:textColor="@android:color/holo_red_dark"
             android:textSize="16sp"
             tools:ignore="HardcodedText" />
 
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Operating status(运行状态):"
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
+
         <Button
-            android:id="@+id/btn"
+            android:id="@+id/btnStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/stop"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnRestart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/restart"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnCrash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

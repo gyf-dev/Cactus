@@ -14,6 +14,7 @@ import com.gyf.cactus.pix.OnePixModel
 
 /**
  * 本地服务
+ *
  * @author geyifeng
  * @date 2019-08-28 17:05
  */
@@ -46,13 +47,20 @@ class LocalService : Service() {
     /**
      * 服务连接次数
      */
-    private var mConnectionTimes = 0
+    private var mConnectionTimes = mTimes
+
+    /**
+     * 停止标识符
+     */
+    private var mIsStop = false
 
     private lateinit var mLocalBinder: LocalBinder
 
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            startRemoteService(this, mCactusConfig)
+            if (!mIsStop) {
+                startRemoteService(this, mCactusConfig)
+            }
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -76,6 +84,11 @@ class LocalService : Service() {
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
+        registerStopReceiver {
+            mIsStop = true
+            mTimes = mConnectionTimes
+            stopSelf()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -89,7 +102,10 @@ class LocalService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopForeground(true)
         onStop()
+        unbindService(mServiceConnection)
+        stopService(Intent(this, RemoteService::class.java))
     }
 
     /**
@@ -120,15 +136,18 @@ class LocalService : Service() {
      * 停止回调
      */
     private fun onStop() {
-        log("LocalService is stop!")
-        WorkManager.getInstance(this).cancelAllWorkByTag(Cactus.CACTUS_TAG)
-        sendBroadcast(Intent(Cactus.CACTUS_STOP))
-        if (Cactus.CALLBACKS.isNotEmpty()) {
-            Cactus.CALLBACKS.forEach {
-                it.onStop()
+        if (mIsServiceRunning) {
+            mIsServiceRunning = false
+            log("LocalService is stop!")
+            WorkManager.getInstance(this).cancelAllWorkByTag(Cactus.CACTUS_TAG)
+            sendBroadcast(Intent(Cactus.CACTUS_STOP))
+            if (Cactus.CALLBACKS.isNotEmpty()) {
+                Cactus.CALLBACKS.forEach {
+                    it.onStop()
+                }
             }
+            unregisterReceiver(mServiceReceiver)
         }
-        unregisterReceiver(mServiceReceiver)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -139,7 +158,6 @@ class LocalService : Service() {
     inner class LocalBinder : ICactusInterface.Stub() {
 
         override fun wakeup(config: CactusConfig) {
-            setNotification(config.notificationConfig)
             mCactusConfig = config
         }
 

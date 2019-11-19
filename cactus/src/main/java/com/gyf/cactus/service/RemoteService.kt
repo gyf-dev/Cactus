@@ -9,9 +9,7 @@ import android.util.Log
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.ICactusInterface
-import com.gyf.cactus.ext.getConfig
-import com.gyf.cactus.ext.setNotification
-import com.gyf.cactus.ext.startLocalService
+import com.gyf.cactus.ext.*
 
 /**
  * 远程服务
@@ -29,13 +27,20 @@ class RemoteService : Service() {
     /**
      * 服务连接次数
      */
-    private var mConnectionTimes = 0
+    private var mConnectionTimes = mTimes
+
+    /**
+     * 停止标识符
+     */
+    private var mIsStop = false
 
     private lateinit var remoteBinder: RemoteBinder
 
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            startLocalService(this, true, mCactusConfig)
+            if (!mIsStop) {
+                startLocalService(this, true, mCactusConfig)
+            }
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -59,6 +64,11 @@ class RemoteService : Service() {
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
+        registerStopReceiver {
+            mIsStop = true
+            mTimes = mConnectionTimes
+            stopSelf()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -71,6 +81,12 @@ class RemoteService : Service() {
         return START_STICKY
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        stopForeground(true)
+        unbindService(mServiceConnection)
+    }
+
     override fun onBind(intent: Intent?): IBinder? {
         remoteBinder = RemoteBinder()
         return remoteBinder
@@ -79,7 +95,6 @@ class RemoteService : Service() {
     inner class RemoteBinder : ICactusInterface.Stub() {
 
         override fun wakeup(config: CactusConfig) {
-            setNotification(config.notificationConfig)
             mCactusConfig = config
         }
 

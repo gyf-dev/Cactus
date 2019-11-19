@@ -14,11 +14,11 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.google.gson.Gson
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.callback.AppBackgroundCallback
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.pix.OnePixActivity
+import com.gyf.cactus.receiver.StopReceiver
 import com.gyf.cactus.service.CactusJobService
 import com.gyf.cactus.service.LocalService
 import com.gyf.cactus.service.RemoteService
@@ -47,9 +47,22 @@ private var mIsForeground = false
 internal val mMainHandler by lazy {
     Handler(Looper.getMainLooper())
 }
+/**
+ * 是否注册过
+ */
+internal var mRegistered = false
+/**
+ * 启动次数
+ */
+internal var mTimes = 0
+/**
+ * 配置信息
+ */
+internal var mCactusConfig: CactusConfig? = null
 
 /**
  * kotlin里使用Cactus
+ *
  * @receiver Context
  * @param block [@kotlin.ExtensionFunctionType] Function1<Cactus, Unit>
  */
@@ -57,7 +70,40 @@ fun Context.cactus(block: Cactus.() -> Unit) =
     Cactus.instance.apply { block() }.register(this)
 
 /**
+ * 注销
+ *
+ * @receiver Context
+ */
+fun Context.cactusUnregister() = Cactus.instance.unregister(this)
+
+/**
+ * 重启
+ *
+ * @receiver Context
+ */
+fun Context.cactusRestart() = Cactus.instance.restart(this)
+
+/**
+ * 是否已经停止
+ *
+ * @receiver Context
+ * @return Boolean
+ */
+val Context.cactusIsRunning
+    get() = Cactus.instance.isRunning(this)
+
+/**
+ * kotlin里使用注册Receiver
+ *
+ * @receiver Context
+ * @param block Function0<Unit>
+ */
+internal fun Context.registerStopReceiver(block: () -> Unit) =
+    StopReceiver.newInstance(this).register(block)
+
+/**
  * 注册Cactus服务
+ *
  * @receiver Context
  * @param cactusConfig CactusConfig
  */
@@ -70,8 +116,9 @@ internal fun Context.register(cactusConfig: CactusConfig) {
             } else {
                 registerCactus(cactusConfig)
             }
-            if (this is Application) {
+            if (this is Application && !mRegistered) {
                 registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
+                mRegistered = true
             }
         } catch (e: Exception) {
             Log.d(Cactus.CACTUS_TAG, "Unable to open cactus service!!")
@@ -80,7 +127,38 @@ internal fun Context.register(cactusConfig: CactusConfig) {
 }
 
 /**
+ * 注销WaterBear
+ *
+ * @receiver Context
+ */
+internal fun Context.unregister() {
+    if (isServiceRunning) {
+        sendBroadcast(Intent().apply {
+            action = Cactus.CACTUS_FLAG_STOP
+        })
+    } else {
+        Log.d(Cactus.CACTUS_TAG, "Cactus is not running!!")
+    }
+}
+
+/**
+ * 重新启动
+ *
+ * @receiver Context
+ */
+internal fun Context.restart() {
+    if (isMain) {
+        if (!isServiceRunning) {
+            register(getConfig())
+        } else {
+            Log.d(Cactus.CACTUS_TAG, "Cactus is running!!")
+        }
+    }
+}
+
+/**
  * 最终都将调用此方法，注册Cactus服务
+ *
  * @receiver Context
  * @param cactusConfig CactusConfig
  */
@@ -93,6 +171,7 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
 
 /**
  * 注册JobService
+ *
  * @receiver Context
  * @param cactusConfig CactusConfig
  */
@@ -104,6 +183,7 @@ internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
 
 /**
  * 开启WorkManager
+ *
  * @receiver Context
  */
 internal fun Context.registerWorker() {
@@ -118,6 +198,7 @@ internal fun Context.registerWorker() {
 
 /**
  * 开启远程服务
+ *
  * @receiver Service
  * @param serviceConnection ServiceConnection
  * @param cactusConfig CactusConfig
@@ -134,6 +215,7 @@ internal fun Service.startRemoteService(
 
 /**
  * 开启本地服务
+ *
  * @receiver Service
  * @param serviceConnection ServiceConnection
  * @param isStart Boolean
@@ -145,9 +227,7 @@ internal fun Service.startLocalService(
     cactusConfig: CactusConfig? = null
 ) {
     val intent = Intent(this, LocalService::class.java)
-    cactusConfig?.let {
-        intent.putExtra(Cactus.CACTUS_CONFIG, it)
-    }
+    intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig ?: getConfig())
     if (isStart) {
         startInternService(intent)
     }
@@ -170,6 +250,7 @@ internal fun Context.startInternService(intent: Intent) {
 
 /**
  * 开启一像素界面
+ *
  * @receiver Context
  */
 internal fun Context.startOnePixActivity() {
@@ -188,49 +269,6 @@ internal fun Context.startOnePixActivity() {
 }
 
 /**
- * 保存配置信息
- *
- * @receiver Context
- * @param cactusConfig CactusConfig
- */
-private fun Context.saveConfig(cactusConfig: CactusConfig) {
-    val serviceId = getServiceId()
-    if (serviceId > 0) {
-        cactusConfig.notificationConfig.serviceId = serviceId
-    }
-    getSharedPreferences(Cactus.CACTUS_TAG, Context.MODE_PRIVATE).edit().apply {
-        putString(Cactus.CACTUS_CONFIG, Gson().toJson(cactusConfig))
-        if (serviceId <= 0) {
-            putInt(Cactus.CACTUS_SERVICE_ID, cactusConfig.notificationConfig.serviceId)
-        }
-    }.apply()
-}
-
-/**
- * 获取配置信息
- *
- * @receiver Context
- * @return CactusConfig
- */
-internal fun Context.getConfig() = getSharedPreferences(
-    Cactus.CACTUS_TAG,
-    Context.MODE_PRIVATE
-).getString(Cactus.CACTUS_CONFIG, null)?.run {
-    Gson().fromJson(this, CactusConfig::class.java)
-} ?: CactusConfig()
-
-/**
- * 获得serviceId
- *
- * @receiver Context
- * @return Int
- */
-private fun Context.getServiceId() = getSharedPreferences(
-    Cactus.CACTUS_TAG,
-    Context.MODE_PRIVATE
-).getInt(Cactus.CACTUS_SERVICE_ID, -1)
-
-/**
  * 销毁一像素
  */
 internal fun finishOnePix() {
@@ -244,6 +282,7 @@ internal fun finishOnePix() {
 
 /**
  * 保存一像素，方便销毁
+ *
  * @receiver OnePixActivity
  */
 internal fun OnePixActivity.setOnePix() {
@@ -254,6 +293,7 @@ internal fun OnePixActivity.setOnePix() {
 
 /**
  * 退到后台
+ *
  * @receiver Context
  */
 internal fun backBackground() {
@@ -333,6 +373,7 @@ internal val Context.isServiceRunning
 
 /**
  * 判断服务是否在运行
+ *
  * @receiver Context
  * @param className String
  * @return Boolean
@@ -355,6 +396,7 @@ internal fun Context.isServiceRunning(className: String): Boolean {
 
 /**
  * 判断任务是否在运行
+ *
  * @receiver Context
  * @param processName String
  * @return Boolean

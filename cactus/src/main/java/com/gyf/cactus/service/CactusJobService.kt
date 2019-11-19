@@ -13,10 +13,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
-import com.gyf.cactus.ext.getConfig
-import com.gyf.cactus.ext.isServiceRunning
-import com.gyf.cactus.ext.registerCactus
-import com.gyf.cactus.ext.setNotification
+import com.gyf.cactus.ext.*
 
 /**
  * @author geyifeng
@@ -29,9 +26,18 @@ class CactusJobService : JobService() {
 
     private val jobId = 100
 
+    /**
+     * 停止标识符
+     */
+    private var mIsStop = false
+
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
+        registerStopReceiver {
+            mIsStop = true
+            stopSelf()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -44,9 +50,16 @@ class CactusJobService : JobService() {
         return Service.START_STICKY
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        stopForeground(true)
+        val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        jobScheduler.cancel(jobId)
+    }
+
     override fun onStartJob(jobParameters: JobParameters): Boolean {
         Log.d(Cactus.CACTUS_TAG, "onStartJob")
-        if (!isServiceRunning) {
+        if (!isServiceRunning && !mIsStop) {
             registerCactus(mCactusConfig)
         }
         return false
@@ -54,7 +67,7 @@ class CactusJobService : JobService() {
 
     override fun onStopJob(jobParameters: JobParameters): Boolean {
         Log.d(Cactus.CACTUS_TAG, "onStopJob")
-        if (!isServiceRunning) {
+        if (!isServiceRunning && !mIsStop) {
             registerCactus(mCactusConfig)
         }
         return false

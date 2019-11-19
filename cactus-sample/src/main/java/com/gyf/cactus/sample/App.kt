@@ -14,6 +14,7 @@ import com.gyf.cactus.callback.CactusCallback
 import com.gyf.cactus.ext.cactus
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,7 +42,13 @@ class App : Application(), CactusCallback {
          * 存活时间
          */
         val mTimer = MutableLiveData<String>()
+        /**
+         * 运行状态
+         */
+        val mStatus = MutableLiveData<Boolean>().apply { value = true }
     }
+
+    private var mDisposable: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -71,6 +78,7 @@ class App : Application(), CactusCallback {
             setBackgroundMusicEnabled(true)
             //可选，运行时回调
             addCallback(this@App)
+            hideNotification(false)
             //可选，切后台切换回调
             addBackgroundCallback {
                 Toast.makeText(this@App, if (it) "退到后台啦" else "跑到前台啦", Toast.LENGTH_SHORT).show()
@@ -85,6 +93,7 @@ class App : Application(), CactusCallback {
     @SuppressLint("CheckResult")
     override fun doWork(times: Int) {
         Log.d(TAG, "doWork:$times")
+        mStatus.postValue(true)
         val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         dateFormat.timeZone = TimeZone.getTimeZone("GMT+00:00")
         var oldTimer = Save.timer
@@ -95,7 +104,7 @@ class App : Application(), CactusCallback {
         }
         mLastTimer.postValue(dateFormat.format(Date(Save.lastTimer * 1000)))
         mEndDate.postValue(Save.endDate)
-        Observable.interval(1, TimeUnit.SECONDS)
+        mDisposable = Observable.interval(1, TimeUnit.SECONDS)
             .map {
                 oldTimer + it
             }
@@ -112,5 +121,11 @@ class App : Application(), CactusCallback {
 
     override fun onStop() {
         Log.d(TAG, "onStop")
+        mStatus.postValue(false)
+        mDisposable?.apply {
+            if (!isDisposed) {
+                dispose()
+            }
+        }
     }
 }

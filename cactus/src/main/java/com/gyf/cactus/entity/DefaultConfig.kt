@@ -7,6 +7,7 @@ import com.gyf.cactus.pix.OnePixModel
 
 /**
  * 默认配置信息
+ *
  * @author geyifeng
  * @date 2019-09-02 09:44
  */
