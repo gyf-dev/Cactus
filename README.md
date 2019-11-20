@@ -18,13 +18,13 @@
           .register(this)
    ```
 ②、注销
-   ```java
+  ```java
     Cactus.getInstance().unregister(this)
-    ```  
+   ```  
 ③、重启 
    ```java
     Cactus.getInstance().restart(this)
-    ```   
+   ```   
 - kotlin用法
 
 ①、注册 
@@ -51,7 +51,7 @@
 ③、重启 
    ```kotlin
     cactusRestart()
-    ```      
+   ```      
 ## 混淆规则(proguard-rules.pro)
    ```
     -keep class com.gyf.cactus.entity.* {*;} 
