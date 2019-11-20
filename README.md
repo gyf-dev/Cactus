@@ -56,6 +56,9 @@
    ```
     -keep class com.gyf.cactus.entity.* {*;} 
    ```
+   
+## 流程图
+![框架流程图](cactus.png)
 
 ## 保活效果，仅供参考(数字代码oom_adj优先级，优先级数字越小越不容易被杀)
   | 维度 | android 6.0以下虚拟机 | android 7.1虚拟机 | android 7/8/8.1/9/10虚拟机 | vovo x23 android 9 | 华为 mate20 /OnePlus (android 9) | 
