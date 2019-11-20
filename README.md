@@ -7,9 +7,9 @@
    ```
 
 ## 用法（具体api请参考注释，这里就不一一列出来了）
-- java用法
+#### java用法
 
-①、注册
+- 注册
    ```java
     Cactus.getInstance()
           .isDebug(true)
@@ -17,17 +17,17 @@
           .addCallback(new CactusaddCallback())
           .register(this)
    ```
-②、注销
+- 注销
   ```java
     Cactus.getInstance().unregister(this)
    ```  
-③、重启 
+- 重启 
    ```java
     Cactus.getInstance().restart(this)
    ```   
-- kotlin用法
+#### kotlin用法
 
-①、注册 
+- 注册 
    ```kotlin
     cactus {
        setPendingIntent(pendingIntent)
@@ -44,11 +44,11 @@
        })
     }
    ```
-②、注销 
+- 注销 
    ```kotlin
     cactusUnregister()
    ``` 
-③、重启 
+- 重启 
    ```kotlin
     cactusRestart()
    ```      
