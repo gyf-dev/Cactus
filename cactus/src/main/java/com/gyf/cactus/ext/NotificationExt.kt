@@ -49,9 +49,10 @@ internal fun Service.setNotification(
     notificationConfig: NotificationConfig,
     isHideService: Boolean = false
 ) {
-    val hasNotification = mHasNotification[toString()]
+    val tag = Cactus.CACTUS_TAG + System.identityHashCode(this)
+    val hasNotification = mHasNotification[tag]
     if (hasNotification == null || !hasNotification) {
-        mHasNotification[toString()] = true
+        mHasNotification[tag] = true
         val managerCompat = NotificationManagerCompat.from(this)
         val notification = getNotification(notificationConfig)
         notificationConfig.apply {

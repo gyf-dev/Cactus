@@ -206,7 +206,8 @@ internal fun Context.registerWorker() {
 internal fun Service.startRemoteService(
     serviceConnection: ServiceConnection,
     cactusConfig: CactusConfig
-) {
+) = run {
+    setNotification(cactusConfig.notificationConfig)
     val intent = Intent(this, RemoteService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
     startInternService(intent)
@@ -225,7 +226,8 @@ internal fun Service.startLocalService(
     serviceConnection: ServiceConnection,
     isStart: Boolean = false,
     cactusConfig: CactusConfig? = null
-) {
+) = run {
+    setNotification((cactusConfig ?: getConfig()).notificationConfig)
     val intent = Intent(this, LocalService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig ?: getConfig())
     if (isStart) {

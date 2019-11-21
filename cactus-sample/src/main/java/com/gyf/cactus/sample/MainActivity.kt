@@ -3,6 +3,7 @@ package com.gyf.cactus.sample
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.gyf.cactus.ext.cactusRestart
@@ -16,6 +17,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 @Suppress("DIVISION_BY_ZERO")
 @SuppressLint("SetTextI18n")
 class MainActivity : BaseActivity() {
+
+    private var times = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +49,11 @@ class MainActivity : BaseActivity() {
 
     private fun setListener() {
         //停止
-        btnStop.setOnClickListener {
+        btnStop.onClick {
             cactusUnregister()
         }
         //重启
-        btnRestart.setOnClickListener {
+        btnRestart.onClick {
             cactusRestart()
         }
         //奔溃
@@ -63,6 +66,23 @@ class MainActivity : BaseActivity() {
             Handler().postDelayed({
                 2 / 0
             }, 3000)
+        }
+    }
+
+    private inline fun View.onClick(crossinline block: () -> Unit) {
+        setOnClickListener {
+            val nowTime = System.currentTimeMillis()
+            val intervals = nowTime - times
+            if (intervals > 5000) {
+                times = nowTime
+                block()
+            } else {
+                Toast.makeText(
+                    context,
+                    ((5000 - intervals) / 1000).toString() + "秒之后再点击",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 }

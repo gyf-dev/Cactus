@@ -34,12 +34,18 @@ class RemoteService : Service() {
      */
     private var mIsStop = false
 
+    /**
+     * 是否已经绑定
+     */
+    private var mIsBind = false
+
     private lateinit var remoteBinder: RemoteBinder
 
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             if (!mIsStop) {
-                startLocalService(this, true, mCactusConfig)
+                mIsBind = startLocalService(this, true, mCactusConfig)
+                setNotification(mCactusConfig.notificationConfig)
             }
         }
 
@@ -64,6 +70,7 @@ class RemoteService : Service() {
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
+        setNotification(mCactusConfig.notificationConfig)
         registerStopReceiver {
             mIsStop = true
             mTimes = mConnectionTimes
@@ -75,8 +82,8 @@ class RemoteService : Service() {
         intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
             mCactusConfig = it
         }
+        mIsBind = startLocalService(mServiceConnection, false, mCactusConfig)
         setNotification(mCactusConfig.notificationConfig)
-        startLocalService(mServiceConnection)
         log("RemoteService is run")
         return START_STICKY
     }
@@ -84,7 +91,9 @@ class RemoteService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopForeground(true)
-        unbindService(mServiceConnection)
+        if (mIsBind) {
+            unbindService(mServiceConnection)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -96,6 +105,7 @@ class RemoteService : Service() {
 
         override fun wakeup(config: CactusConfig) {
             mCactusConfig = config
+            setNotification(mCactusConfig.notificationConfig)
         }
 
         override fun connectionTimes(time: Int) {

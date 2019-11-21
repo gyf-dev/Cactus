@@ -5,7 +5,6 @@ import android.content.*
 import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
-import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.ICactusInterface
@@ -32,7 +31,7 @@ class LocalService : Service() {
     /**
      * 广播
      */
-    private val mServiceReceiver = ServiceReceiver()
+    private var mServiceReceiver: ServiceReceiver? = null
 
     /**
      * Service是否在运行
@@ -54,12 +53,18 @@ class LocalService : Service() {
      */
     private var mIsStop = false
 
+    /**
+     * 是否已经绑定
+     */
+    private var mIsBind = false
+
     private lateinit var mLocalBinder: LocalBinder
 
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             if (!mIsStop) {
-                startRemoteService(this, mCactusConfig)
+                mIsBind = startRemoteService(this, mCactusConfig)
+                setNotification(mCactusConfig.notificationConfig)
             }
         }
 
@@ -84,6 +89,7 @@ class LocalService : Service() {
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
+        setNotification(mCactusConfig.notificationConfig)
         registerStopReceiver {
             mIsStop = true
             mTimes = mConnectionTimes
@@ -95,8 +101,8 @@ class LocalService : Service() {
         intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
             mCactusConfig = it
         }
+        mIsBind = startRemoteService(mServiceConnection, mCactusConfig)
         setNotification(mCactusConfig.notificationConfig)
-        startRemoteService(mServiceConnection, mCactusConfig)
         return START_STICKY
     }
 
@@ -104,50 +110,10 @@ class LocalService : Service() {
         super.onDestroy()
         stopForeground(true)
         onStop()
-        unbindService(mServiceConnection)
+        if (mIsBind) {
+            unbindService(mServiceConnection)
+        }
         stopService(Intent(this, RemoteService::class.java))
-    }
-
-    /**
-     * 处理外部事情
-     * @param times Int
-     */
-    private fun doWork(times: Int) {
-        if (!mIsServiceRunning) {
-            mIsServiceRunning = true
-            log("LocalService is run >>>> do work times = $times")
-            registerMedia()
-            registerBroadcastReceiver()
-            sendBroadcast(
-                Intent(Cactus.CACTUS_WORK).putExtra(
-                    Cactus.CACTUS_TIMES,
-                    times
-                )
-            )
-            if (Cactus.CALLBACKS.isNotEmpty()) {
-                Cactus.CALLBACKS.forEach {
-                    it.doWork(times)
-                }
-            }
-        }
-    }
-
-    /**
-     * 停止回调
-     */
-    private fun onStop() {
-        if (mIsServiceRunning) {
-            mIsServiceRunning = false
-            log("LocalService is stop!")
-            WorkManager.getInstance(this).cancelAllWorkByTag(Cactus.CACTUS_TAG)
-            sendBroadcast(Intent(Cactus.CACTUS_STOP))
-            if (Cactus.CALLBACKS.isNotEmpty()) {
-                Cactus.CALLBACKS.forEach {
-                    it.onStop()
-                }
-            }
-            unregisterReceiver(mServiceReceiver)
-        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -159,6 +125,7 @@ class LocalService : Service() {
 
         override fun wakeup(config: CactusConfig) {
             mCactusConfig = config
+            setNotification(mCactusConfig.notificationConfig)
         }
 
         override fun connectionTimes(time: Int) {
@@ -207,6 +174,48 @@ class LocalService : Service() {
     }
 
     /**
+     * 处理外部事情
+     *
+     * @param times Int，启动次数
+     */
+    private fun doWork(times: Int) {
+        if (!mIsServiceRunning) {
+            mIsServiceRunning = true
+            log("LocalService is run >>>> do work times = $times")
+            registerMedia()
+            registerBroadcastReceiver()
+            sendBroadcast(
+                Intent(Cactus.CACTUS_WORK).putExtra(
+                    Cactus.CACTUS_TIMES,
+                    times
+                )
+            )
+            if (Cactus.CALLBACKS.isNotEmpty()) {
+                Cactus.CALLBACKS.forEach {
+                    it.doWork(times)
+                }
+            }
+        }
+    }
+
+    /**
+     * 停止回调
+     */
+    private fun onStop() {
+        if (mIsServiceRunning) {
+            mIsServiceRunning = false
+            log("LocalService is stop!")
+            unregisterReceiver()
+            sendBroadcast(Intent(Cactus.CACTUS_STOP))
+            if (Cactus.CALLBACKS.isNotEmpty()) {
+                Cactus.CALLBACKS.forEach {
+                    it.onStop()
+                }
+            }
+        }
+    }
+
+    /**
      * 打开一像素
      */
     private fun openOnePix() {
@@ -243,15 +252,30 @@ class LocalService : Service() {
     }
 
     /**
-     * 注册息屏亮屏广播监听
+     * 注册息屏亮屏、前后台切换广播监听
      */
     private fun registerBroadcastReceiver() {
-        registerReceiver(mServiceReceiver, IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Cactus.CACTUS_BACKGROUND)
-            addAction(Cactus.CACTUS_FOREGROUND)
-        })
+        if (mServiceReceiver == null) {
+            mServiceReceiver = ServiceReceiver()
+        }
+        mServiceReceiver?.let {
+            registerReceiver(it, IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Cactus.CACTUS_BACKGROUND)
+                addAction(Cactus.CACTUS_FOREGROUND)
+            })
+        }
+    }
+
+    /**
+     * 注销息屏亮屏、前后台切换广播监听
+     */
+    private fun unregisterReceiver() {
+        mServiceReceiver?.let {
+            unregisterReceiver(it)
+            mServiceReceiver = null
+        }
     }
 
     /**
@@ -313,6 +337,7 @@ class LocalService : Service() {
 
     /**
      * log输出
+     *
      * @param msg String
      */
     private fun log(msg: String) {
