@@ -206,34 +206,46 @@ internal fun Context.registerWorker() {
 internal fun Service.startRemoteService(
     serviceConnection: ServiceConnection,
     cactusConfig: CactusConfig
-) = run {
-    setNotification(cactusConfig.notificationConfig)
-    val intent = Intent(this, RemoteService::class.java)
-    intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
-    startInternService(intent)
-    bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
-}
+) = startAndBindService(RemoteService::class.java, serviceConnection, cactusConfig)
 
 /**
  * 开启本地服务
  *
  * @receiver Service
  * @param serviceConnection ServiceConnection
+ * @param cactusConfig CactusConfig
  * @param isStart Boolean
- * @param cactusConfig CactusConfig?
  */
 internal fun Service.startLocalService(
     serviceConnection: ServiceConnection,
-    isStart: Boolean = false,
-    cactusConfig: CactusConfig? = null
+    cactusConfig: CactusConfig,
+    isStart: Boolean = true
+) = startAndBindService(LocalService::class.java, serviceConnection, cactusConfig, isStart)
+
+/**
+ * 开启并绑定服务
+ *
+ * @receiver Service
+ * @param cls Class<*>
+ * @param serviceConnection ServiceConnection
+ * @param cactusConfig CactusConfig
+ * @param isStart Boolean
+ * @return Boolean
+ */
+private fun Service.startAndBindService(
+    cls: Class<*>,
+    serviceConnection: ServiceConnection,
+    cactusConfig: CactusConfig,
+    isStart: Boolean = true
 ) = run {
-    setNotification((cactusConfig ?: getConfig()).notificationConfig)
-    val intent = Intent(this, LocalService::class.java)
-    intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig ?: getConfig())
+    val intent = Intent(this, cls)
+    intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
     if (isStart) {
         startInternService(intent)
     }
-    bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
+    val bindService = bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
+    sMainHandler.postDelayed({ setNotification(cactusConfig.notificationConfig) }, 2000)
+    bindService
 }
 
 /**

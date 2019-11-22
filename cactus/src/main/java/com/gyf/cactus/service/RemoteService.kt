@@ -44,7 +44,7 @@ class RemoteService : Service() {
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             if (!mIsStop) {
-                mIsBind = startLocalService(this, true, mCactusConfig)
+                mIsBind = startLocalService(this, mCactusConfig)
                 setNotification(mCactusConfig.notificationConfig)
             }
         }
@@ -64,7 +64,6 @@ class RemoteService : Service() {
                         }
                     }
             }
-            setNotification(mCactusConfig.notificationConfig)
         }
     }
 
@@ -86,7 +85,7 @@ class RemoteService : Service() {
             sCactusConfig = it
             mCactusConfig = it
         }
-        mIsBind = startLocalService(mServiceConnection, false, mCactusConfig)
+        mIsBind = startLocalService(mServiceConnection, mCactusConfig, false)
         setNotification(mCactusConfig.notificationConfig)
         log("RemoteService is run")
         return START_STICKY
@@ -109,7 +108,6 @@ class RemoteService : Service() {
 
         override fun wakeup(config: CactusConfig) {
             mCactusConfig = config
-            setNotification(mCactusConfig.notificationConfig)
         }
 
         override fun connectionTimes(time: Int) {

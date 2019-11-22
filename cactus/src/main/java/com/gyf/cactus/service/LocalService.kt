@@ -83,7 +83,6 @@ class LocalService : Service() {
                         }
                     }
             }
-            setNotification(mCactusConfig.notificationConfig)
         }
     }
 
@@ -126,7 +125,6 @@ class LocalService : Service() {
 
         override fun wakeup(config: CactusConfig) {
             mCactusConfig = config
-            setNotification(mCactusConfig.notificationConfig)
         }
 
         override fun connectionTimes(time: Int) {
