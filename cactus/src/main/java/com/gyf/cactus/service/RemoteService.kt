@@ -100,7 +100,6 @@ class RemoteService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         remoteBinder = RemoteBinder()
-        setNotification(mCactusConfig.notificationConfig)
         return remoteBinder
     }
 
@@ -108,6 +107,7 @@ class RemoteService : Service() {
 
         override fun wakeup(config: CactusConfig) {
             mCactusConfig = config
+            setNotification(mCactusConfig.notificationConfig)
         }
 
         override fun connectionTimes(time: Int) {
