@@ -83,6 +83,7 @@ class LocalService : Service() {
                         }
                     }
             }
+            setNotification(mCactusConfig.notificationConfig)
         }
     }
 

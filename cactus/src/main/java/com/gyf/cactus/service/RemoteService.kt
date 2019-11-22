@@ -64,13 +64,13 @@ class RemoteService : Service() {
                         }
                     }
             }
+            setNotification(mCactusConfig.notificationConfig)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
-        setNotification(mCactusConfig.notificationConfig)
         registerStopReceiver {
             mIsStop = true
             mTimes = mConnectionTimes
