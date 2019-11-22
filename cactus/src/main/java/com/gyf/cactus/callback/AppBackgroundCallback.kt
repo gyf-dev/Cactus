@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import com.gyf.cactus.Cactus
-import com.gyf.cactus.ext.mMainHandler
+import com.gyf.cactus.ext.sMainHandler
 import com.gyf.cactus.pix.OnePixActivity
 import java.lang.ref.WeakReference
 
@@ -44,7 +44,7 @@ class AppBackgroundCallback @JvmOverloads constructor(
     }
 
     init {
-        mMainHandler.postDelayed({
+        sMainHandler.postDelayed({
             if (mFrontActivityCount == 0) {
                 post()
             }
@@ -90,14 +90,14 @@ class AppBackgroundCallback @JvmOverloads constructor(
         (mContext?.get() ?: context)?.apply {
             if (mFrontActivityCount == 0) {
                 mIsSend = false
-                mMainHandler.postDelayed {
+                sMainHandler.postDelayed {
                     sendBroadcast(Intent().setAction(Cactus.CACTUS_BACKGROUND))
                     block?.let { it(true) }
                 }
             } else {
                 if (!mIsSend) {
                     mIsSend = true
-                    mMainHandler.postDelayed {
+                    sMainHandler.postDelayed {
                         sendBroadcast(Intent().setAction(Cactus.CACTUS_FOREGROUND))
                         block?.let { it(false) }
                     }

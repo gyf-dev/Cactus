@@ -66,7 +66,7 @@ internal fun Service.setNotification(
                     if (managerCompat.getNotificationChannel(notification.channelId) != null
                         && hideNotificationAfterO
                     ) {
-                        mMainHandler.post { managerCompat.deleteNotificationChannel(notification.channelId) }
+                        sMainHandler.post { managerCompat.deleteNotificationChannel(notification.channelId) }
                     }
                 } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
                     if (!isHideService) {

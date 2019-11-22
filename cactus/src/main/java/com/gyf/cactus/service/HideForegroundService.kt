@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.IBinder
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.NotificationConfig
-import com.gyf.cactus.ext.mMainHandler
+import com.gyf.cactus.ext.sMainHandler
 import com.gyf.cactus.ext.setNotification
 
 /**
@@ -20,7 +20,7 @@ class HideForegroundService : Service() {
             ?.let {
                 setNotification(it, true)
             }
-        mMainHandler.postDelayed({
+        sMainHandler.postDelayed({
             stopForeground(true)
             stopSelf()
         }, 2000)

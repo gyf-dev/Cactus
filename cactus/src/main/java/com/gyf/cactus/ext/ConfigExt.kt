@@ -20,7 +20,7 @@ import com.gyf.cactus.entity.CactusConfig
  */
 internal fun Context.saveConfig(cactusConfig: CactusConfig) {
     val serviceId = getServiceId()
-    mCactusConfig = cactusConfig
+    sCactusConfig = cactusConfig
     if (serviceId > 0) {
         cactusConfig.notificationConfig.serviceId = serviceId
     }
@@ -38,7 +38,7 @@ internal fun Context.saveConfig(cactusConfig: CactusConfig) {
  * @receiver Context
  * @return CactusConfig
  */
-internal fun Context.getConfig() = mCactusConfig ?: getSharedPreferences(
+internal fun Context.getConfig() = sCactusConfig ?: getSharedPreferences(
     Cactus.CACTUS_TAG,
     Context.MODE_PRIVATE
 ).getString(Cactus.CACTUS_CONFIG, null)?.run {

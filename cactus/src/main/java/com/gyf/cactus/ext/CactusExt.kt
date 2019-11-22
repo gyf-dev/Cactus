@@ -44,21 +44,21 @@ private var mIsForeground = false
 /**
  * 主Handler
  */
-internal val mMainHandler by lazy {
+internal val sMainHandler by lazy {
     Handler(Looper.getMainLooper())
 }
 /**
  * 是否注册过
  */
-internal var mRegistered = false
+internal var sRegistered = false
 /**
  * 启动次数
  */
-internal var mTimes = 0
+internal var sTimes = 0
 /**
  * 配置信息
  */
-internal var mCactusConfig: CactusConfig? = null
+internal var sCactusConfig: CactusConfig? = null
 
 /**
  * kotlin里使用Cactus
@@ -116,9 +116,9 @@ internal fun Context.register(cactusConfig: CactusConfig) {
             } else {
                 registerCactus(cactusConfig)
             }
-            if (this is Application && !mRegistered) {
+            if (this is Application && !sRegistered) {
                 registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
-                mRegistered = true
+                sRegistered = true
             }
         } catch (e: Exception) {
             Log.d(Cactus.CACTUS_TAG, "Unable to open cactus service!!")
@@ -166,7 +166,7 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, LocalService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
     startInternService(intent)
-    mMainHandler.postDelayed({ registerWorker() }, 5000)
+    sMainHandler.postDelayed({ registerWorker() }, 5000)
 }
 
 /**

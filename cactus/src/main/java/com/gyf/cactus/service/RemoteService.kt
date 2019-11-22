@@ -27,7 +27,7 @@ class RemoteService : Service() {
     /**
      * 服务连接次数
      */
-    private var mConnectionTimes = mTimes
+    private var mConnectionTimes = sTimes
 
     /**
      * 停止标识符
@@ -71,15 +71,19 @@ class RemoteService : Service() {
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
+        sCactusConfig?.apply {
+            setNotification(notificationConfig)
+        }
         registerStopReceiver {
             mIsStop = true
-            mTimes = mConnectionTimes
+            sTimes = mConnectionTimes
             stopSelf()
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
+            sCactusConfig = it
             mCactusConfig = it
         }
         mIsBind = startLocalService(mServiceConnection, false, mCactusConfig)

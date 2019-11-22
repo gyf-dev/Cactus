@@ -46,7 +46,7 @@ class LocalService : Service() {
     /**
      * 服务连接次数
      */
-    private var mConnectionTimes = mTimes
+    private var mConnectionTimes = sTimes
 
     /**
      * 停止标识符
@@ -93,7 +93,7 @@ class LocalService : Service() {
         setNotification(mCactusConfig.notificationConfig)
         registerStopReceiver {
             mIsStop = true
-            mTimes = mConnectionTimes
+            sTimes = mConnectionTimes
             stopSelf()
         }
     }
@@ -221,7 +221,7 @@ class LocalService : Service() {
      */
     private fun openOnePix() {
         if (mCactusConfig.defaultConfig.onePixEnabled) {
-            mMainHandler.postDelayed({ startOnePixActivity() }, 1000)
+            sMainHandler.postDelayed({ startOnePixActivity() }, 1000)
         }
     }
 
@@ -292,7 +292,7 @@ class LocalService : Service() {
                     setVolume(0f, 0f)
                 }
                 setOnCompletionListener {
-                    mMainHandler.postDelayed(
+                    sMainHandler.postDelayed(
                         {
                             mIsMusicRunning = false
                             playMusic()
