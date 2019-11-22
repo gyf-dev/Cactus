@@ -244,7 +244,6 @@ private fun Service.startAndBindService(
         startInternService(intent)
     }
     val bindService = bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
-    sMainHandler.postDelayed({ setNotification(cactusConfig.notificationConfig) }, 2000)
     bindService
 }
 

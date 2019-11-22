@@ -64,15 +64,13 @@ class RemoteService : Service() {
                         }
                     }
             }
+            setNotification(mCactusConfig.notificationConfig)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
-        sCactusConfig?.apply {
-            setNotification(notificationConfig)
-        }
         registerStopReceiver {
             mIsStop = true
             sTimes = mConnectionTimes
@@ -101,6 +99,7 @@ class RemoteService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         remoteBinder = RemoteBinder()
+        setNotification(mCactusConfig.notificationConfig)
         return remoteBinder
     }
 
