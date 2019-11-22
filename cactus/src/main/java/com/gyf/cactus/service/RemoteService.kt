@@ -94,6 +94,7 @@ class RemoteService : Service() {
         stopForeground(true)
         if (mIsBind) {
             unbindService(mServiceConnection)
+            mIsBind = false
         }
     }
 

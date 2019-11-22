@@ -113,6 +113,7 @@ class LocalService : Service() {
         onStop()
         if (mIsBind) {
             unbindService(mServiceConnection)
+            mIsBind = false
         }
         stopService(Intent(this, RemoteService::class.java))
     }
