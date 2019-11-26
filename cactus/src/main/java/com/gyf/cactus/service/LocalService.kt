@@ -64,7 +64,6 @@ class LocalService : Service() {
         override fun onServiceDisconnected(name: ComponentName?) {
             if (!mIsStop) {
                 mIsBind = startRemoteService(this, mCactusConfig)
-                setNotification(mCactusConfig.notificationConfig)
             }
         }
 
@@ -83,14 +82,12 @@ class LocalService : Service() {
                         }
                     }
             }
-            setNotification(mCactusConfig.notificationConfig)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
-        setNotification(mCactusConfig.notificationConfig)
         registerStopReceiver {
             mIsStop = true
             sTimes = mConnectionTimes
@@ -103,7 +100,6 @@ class LocalService : Service() {
             mCactusConfig = it
         }
         mIsBind = startRemoteService(mServiceConnection, mCactusConfig)
-        setNotification(mCactusConfig.notificationConfig)
         return START_STICKY
     }
 

@@ -34,7 +34,7 @@ data class NotificationConfig(
     /**
      * 通知栏内容
      */
-    var content: String = "The app of cactus is running",
+    var content: String = "Cactus is running",
     /**
      * 小图标
      */

@@ -127,7 +127,7 @@ internal fun Context.register(cactusConfig: CactusConfig) {
 }
 
 /**
- * 注销WaterBear
+ * 注销Cactus
  *
  * @receiver Context
  */

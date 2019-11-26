@@ -45,7 +45,6 @@ class RemoteService : Service() {
         override fun onServiceDisconnected(name: ComponentName?) {
             if (!mIsStop) {
                 mIsBind = startLocalService(this, mCactusConfig)
-                setNotification(mCactusConfig.notificationConfig)
             }
         }
 
@@ -64,7 +63,6 @@ class RemoteService : Service() {
                         }
                     }
             }
-            setNotification(mCactusConfig.notificationConfig)
         }
     }
 
@@ -84,7 +82,6 @@ class RemoteService : Service() {
             mCactusConfig = it
         }
         mIsBind = startLocalService(mServiceConnection, mCactusConfig, false)
-        setNotification(mCactusConfig.notificationConfig)
         log("RemoteService is run")
         return START_STICKY
     }
