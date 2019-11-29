@@ -39,7 +39,7 @@ class CactusWorker(val context: Context, workerParams: WorkerParameters) :
                 if (cactusConfig.defaultConfig.debug) {
                     Log.d(
                         Cactus.CACTUS_TAG,
-                        "CactusWorker-isServiceRunning${isServiceRunning}"
+                        "CactusWorker-isServiceRunning:$isServiceRunning"
                     )
                 }
                 if (!isServiceRunning) {
