@@ -14,7 +14,7 @@
     Cactus.getInstance()
           .isDebug(true)
           .setPendingIntent(pendingIntent)
-          .addCallback(new CactusaddCallback())
+          .addCallback(new CactusCallback())
           .register(this)
    ```
 - 注销
