@@ -16,7 +16,6 @@ import com.gyf.cactus.ext.isServiceRunning
 import com.gyf.cactus.ext.register
 import com.gyf.cactus.ext.restart
 import com.gyf.cactus.ext.unregister
-import com.gyf.cactus.pix.OnePixModel
 
 /**
  * Cactus保活方案，Cactus有两种形式处理回调事件，
@@ -279,16 +278,6 @@ class Cactus private constructor() {
      */
     fun setOnePixEnabled(enabled: Boolean) = apply {
         mDefaultConfig.onePixEnabled = enabled
-    }
-
-    /**
-     * 一像素模式，感觉没啥用，非必传
-     *
-     * @param onePixModel OnePixModel
-     * @return Cactus
-     */
-    fun setOnePixModel(onePixModel: OnePixModel) = apply {
-        mDefaultConfig.onePixModel = onePixModel
     }
 
     /**

@@ -3,7 +3,6 @@ package com.gyf.cactus.entity
 import android.os.Parcel
 import android.os.Parcelable
 import com.gyf.cactus.R
-import com.gyf.cactus.pix.OnePixModel
 
 /**
  * 默认配置信息
@@ -35,11 +34,7 @@ data class DefaultConfig(
     /**
      * 是否可以使用一像素
      */
-    var onePixEnabled: Boolean = true,
-    /**
-     * 一像素模式
-     */
-    var onePixModel: OnePixModel = OnePixModel.DEFAULT
+    var onePixEnabled: Boolean = true
 ) : Parcelable {
     constructor(source: Parcel) : this(
         1 == source.readInt(),
@@ -47,8 +42,7 @@ data class DefaultConfig(
         1 == source.readInt(),
         source.readLong(),
         source.readInt(),
-        1 == source.readInt(),
-        OnePixModel.values()[source.readInt()]
+        1 == source.readInt()
     )
 
     override fun describeContents() = 0
@@ -60,7 +54,6 @@ data class DefaultConfig(
         writeLong(repeatInterval)
         writeInt(musicId)
         writeInt((if (onePixEnabled) 1 else 0))
-        writeInt(onePixModel.ordinal)
     }
 
     companion object {

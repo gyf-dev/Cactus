@@ -5,10 +5,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import android.os.PowerManager
+import android.os.*
 import android.util.Log
 import androidx.work.Constraints
 import androidx.work.NetworkType
@@ -166,6 +163,8 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, LocalService::class.java)
     intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
     startInternService(intent)
+    //先取消上一次注册的任务
+    WorkManager.getInstance(this).cancelAllWorkByTag(Cactus.CACTUS_TAG)
     sMainHandler.postDelayed({ registerWorker() }, 5000)
 }
 
@@ -187,13 +186,17 @@ internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
  * @receiver Context
  */
 internal fun Context.registerWorker() {
-    val constraintsBuilder = Constraints.Builder()
-    constraintsBuilder.setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-    val workRequest = PeriodicWorkRequest.Builder(CactusWorker::class.java, 15, TimeUnit.SECONDS)
-        .setConstraints(constraintsBuilder.build())
-        .addTag(Cactus.CACTUS_TAG)
-        .build()
-    WorkManager.getInstance(this).enqueue(workRequest)
+    if (isServiceRunning) {
+        //注册新任务
+        val constraintsBuilder = Constraints.Builder()
+        constraintsBuilder.setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+        val workRequest =
+            PeriodicWorkRequest.Builder(CactusWorker::class.java, 15, TimeUnit.SECONDS)
+                .setConstraints(constraintsBuilder.build())
+                .addTag(Cactus.CACTUS_TAG)
+                .build()
+        WorkManager.getInstance(this).enqueue(workRequest)
+    }
 }
 
 /**
@@ -359,7 +362,7 @@ internal val Context.isScreenOn
  */
 internal val Context.isMain
     get() = run {
-        val pid = android.os.Process.myPid()
+        val pid = Process.myPid()
         var processName = ""
         val mActivityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         if (mActivityManager.runningAppProcesses != null) {
@@ -425,4 +428,19 @@ internal fun Context.isRunningTaskExist(processName: String): Boolean {
         }
     }
     return false
+}
+
+/**
+ * 解除DeathRecipient绑定
+ *
+ * @receiver IBinder.DeathRecipient
+ * @param iInterface IInterface?
+ * @param block Function0<Unit>?
+ */
+internal fun IBinder.DeathRecipient.unlinkToDeath(
+    iInterface: IInterface? = null,
+    block: (() -> Unit)? = null
+) {
+    iInterface?.asBinder()?.unlinkToDeath(this, 0)
+    block?.invoke()
 }

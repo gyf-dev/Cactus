@@ -20,6 +20,10 @@ class MainActivity : BaseActivity() {
 
     private var times = 0L
 
+    companion object {
+        private const val TIME = 4000L
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -58,14 +62,14 @@ class MainActivity : BaseActivity() {
         }
         //奔溃
         btnCrash.setOnClickListener {
-            Toast.makeText(
-                this,
-                "The app will crash after three seconds(3s后退出)",
-                Toast.LENGTH_SHORT
-            ).show()
-            Handler().postDelayed({
-                2 / 0
-            }, 3000)
+//            Toast.makeText(
+//                this,
+//                "The app will crash after three seconds(3s后退出)",
+//                Toast.LENGTH_SHORT
+//            ).show()
+//            Handler().postDelayed({
+//                2 / 0
+//            }, 3000)
         }
     }
 
@@ -73,13 +77,13 @@ class MainActivity : BaseActivity() {
         setOnClickListener {
             val nowTime = System.currentTimeMillis()
             val intervals = nowTime - times
-            if (intervals > 5000) {
+            if (intervals > TIME) {
                 times = nowTime
                 block()
             } else {
                 Toast.makeText(
                     context,
-                    ((5000 - intervals) / 1000).toString() + "秒之后再点击",
+                    ((TIME.toFloat() - intervals) / 1000).toString() + "秒之后再点击",
                     Toast.LENGTH_SHORT
                 ).show()
             }

@@ -34,15 +34,17 @@ class CactusWorker(val context: Context, workerParams: WorkerParameters) :
 
     override fun doWork(): Result {
         return if (!mIsStop) {
-            val cactusConfig = context.getConfig()
-            if (cactusConfig.defaultConfig.debug) {
-                Log.d(
-                    Cactus.CACTUS_TAG,
-                    "CactusWorker-isServiceRunning${applicationContext.isServiceRunning}"
-                )
-            }
-            if (!applicationContext.isServiceRunning) {
-                applicationContext.register(cactusConfig)
+            context.apply {
+                val cactusConfig = getConfig()
+                if (cactusConfig.defaultConfig.debug) {
+                    Log.d(
+                        Cactus.CACTUS_TAG,
+                        "CactusWorker-isServiceRunning${isServiceRunning}"
+                    )
+                }
+                if (!isServiceRunning) {
+                    register(cactusConfig)
+                }
             }
             Result.success()
         } else {

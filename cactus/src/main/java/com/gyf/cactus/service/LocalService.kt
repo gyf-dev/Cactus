@@ -9,7 +9,6 @@ import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.ICactusInterface
 import com.gyf.cactus.ext.*
-import com.gyf.cactus.pix.OnePixModel
 
 /**
  * 本地服务
@@ -17,7 +16,7 @@ import com.gyf.cactus.pix.OnePixModel
  * @author geyifeng
  * @date 2019-08-28 17:05
  */
-class LocalService : Service() {
+class LocalService : Service(), IBinder.DeathRecipient {
 
     /**
      * 配置信息
@@ -58,30 +57,57 @@ class LocalService : Service() {
      */
     private var mIsBind = false
 
+    /**
+     * 是否已经注册linkToDeath
+     */
+    private var mIsDeathBind = false
+
     private lateinit var mLocalBinder: LocalBinder
+
+    private var mIInterface: ICactusInterface? = null
 
     private val mServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
+            log("onServiceDisconnected")
             if (!mIsStop) {
                 mIsBind = startRemoteService(this, mCactusConfig)
             }
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            log("onServiceConnected")
             service?.let {
-                ICactusInterface.Stub.asInterface(it)
+                mIInterface = ICactusInterface.Stub.asInterface(it)
                     ?.apply {
-                        if (asBinder().isBinderAlive) {
-                            ++mConnectionTimes
+                        if (asBinder().isBinderAlive && asBinder().pingBinder()) {
                             try {
+                                ++mConnectionTimes
                                 wakeup(mCactusConfig)
                                 connectionTimes(mConnectionTimes)
+                                if (!mIsDeathBind) {
+                                    mIsDeathBind = true
+                                    asBinder().linkToDeath(this@LocalService, 0)
+                                }
                             } catch (e: Exception) {
                                 --mConnectionTimes
                             }
                         }
                     }
             }
+        }
+    }
+
+    override fun binderDied() {
+        log("binderDied")
+        try {
+            unlinkToDeath(mIInterface) {
+                mIsDeathBind = false
+                mIInterface = null
+                if (!mIsStop) {
+                    mIsBind = startRemoteService(mServiceConnection, mCactusConfig)
+                }
+            }
+        } catch (e: Exception) {
         }
     }
 
@@ -99,6 +125,7 @@ class LocalService : Service() {
         intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
             mCactusConfig = it
         }
+        setNotification(mCactusConfig.notificationConfig)
         mIsBind = startRemoteService(mServiceConnection, mCactusConfig)
         return START_STICKY
     }
@@ -106,12 +133,9 @@ class LocalService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopForeground(true)
-        onStop()
-        if (mIsBind) {
-            unbindService(mServiceConnection)
-            mIsBind = false
-        }
+        stopBind()
         stopService(Intent(this, RemoteService::class.java))
+        onStop()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -123,11 +147,11 @@ class LocalService : Service() {
 
         override fun wakeup(config: CactusConfig) {
             mCactusConfig = config
-            setNotification(mCactusConfig.notificationConfig)
         }
 
         override fun connectionTimes(time: Int) {
             mConnectionTimes = time
+            sTimes = time
             doWork((mConnectionTimes + 1) / 2)
         }
     }
@@ -154,20 +178,37 @@ class LocalService : Service() {
                             pauseMusic()
                         }
                     }
-                    Cactus.CACTUS_BACKGROUND -> {
+                    Cactus.CACTUS_BACKGROUND + packageName -> {
                         log("background")
                         if (mCactusConfig.defaultConfig.backgroundMusicEnabled) {
                             playMusic()
                         }
                         onBackground(true)
                     }
-                    Cactus.CACTUS_FOREGROUND -> {
+                    Cactus.CACTUS_FOREGROUND + packageName -> {
                         log("foreground")
                         pauseMusic()
                         onBackground(false)
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 解除相关绑定
+     */
+    private fun stopBind() {
+        try {
+            if (mIsDeathBind) {
+                mIsDeathBind = false
+                unlinkToDeath(mIInterface)
+            }
+            if (mIsBind) {
+                unbindService(mServiceConnection)
+                mIsBind = false
+            }
+        } catch (e: Exception) {
         }
     }
 
@@ -229,9 +270,7 @@ class LocalService : Service() {
         mCactusConfig.defaultConfig.apply {
             if (onePixEnabled) {
                 backBackground()
-                if (onePixModel == OnePixModel.DEFAULT) {
-                    finishOnePix()
-                }
+                finishOnePix()
             }
         }
     }
@@ -260,8 +299,8 @@ class LocalService : Service() {
             registerReceiver(it, IntentFilter().apply {
                 addAction(Intent.ACTION_SCREEN_ON)
                 addAction(Intent.ACTION_SCREEN_OFF)
-                addAction(Cactus.CACTUS_BACKGROUND)
-                addAction(Cactus.CACTUS_FOREGROUND)
+                addAction(Cactus.CACTUS_BACKGROUND + packageName)
+                addAction(Cactus.CACTUS_FOREGROUND + packageName)
             })
         }
     }

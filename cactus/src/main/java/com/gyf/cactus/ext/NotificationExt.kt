@@ -42,6 +42,7 @@ private val NotificationConfig.handleSmallIcon
 
 /**
  * 设置通知栏信息
+ *
  * @receiver Service
  * @param notificationConfig NotificationConfig
  */
@@ -80,7 +81,6 @@ internal fun Service.setNotification(
     }
 }
 
-
 /**
  * 获得Notification
  *
@@ -104,6 +104,7 @@ private fun Context.getNotification(notificationConfig: NotificationConfig): Not
                 )
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                .setVisibility(NotificationCompat.VISIBILITY_SECRET)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .apply {
                     remoteViews?.also {
