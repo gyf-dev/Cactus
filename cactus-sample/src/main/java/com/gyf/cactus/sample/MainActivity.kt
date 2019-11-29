@@ -62,14 +62,14 @@ class MainActivity : BaseActivity() {
         }
         //奔溃
         btnCrash.setOnClickListener {
-//            Toast.makeText(
-//                this,
-//                "The app will crash after three seconds(3s后退出)",
-//                Toast.LENGTH_SHORT
-//            ).show()
-//            Handler().postDelayed({
-//                2 / 0
-//            }, 3000)
+            Toast.makeText(
+                this,
+                "The app will crash after three seconds(3s后退出)",
+                Toast.LENGTH_SHORT
+            ).show()
+            Handler().postDelayed({
+                2 / 0
+            }, 3000)
         }
     }
 
