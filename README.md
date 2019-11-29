@@ -3,7 +3,7 @@
 ## 使用 
 > android studio
    ```groovy
-   implementation 'com.gyf.cactus:cactus:1.1.2'
+   implementation 'com.gyf.cactus:cactus:1.1.3-beta01'
    ```
 
 ## 用法（具体api请参考注释，这里就不一一列出来了）
