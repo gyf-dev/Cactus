@@ -23,7 +23,6 @@ import com.gyf.cactus.workmanager.CactusWorker
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
-
 /**
  * Cactus扩展
  * @author geyifeng
@@ -118,7 +117,7 @@ internal fun Context.register(cactusConfig: CactusConfig) {
                 sRegistered = true
             }
         } catch (e: Exception) {
-            Log.d(Cactus.CACTUS_TAG, "Unable to open cactus service!!")
+            log("Unable to open cactus service!!")
         }
     }
 }
@@ -134,7 +133,7 @@ internal fun Context.unregister() {
             action = Cactus.CACTUS_FLAG_STOP
         })
     } else {
-        Log.d(Cactus.CACTUS_TAG, "Cactus is not running!!")
+        log("Cactus is not running!!")
     }
 }
 
@@ -148,7 +147,7 @@ internal fun Context.restart() {
         if (!isServiceRunning) {
             register(getConfig())
         } else {
-            Log.d(Cactus.CACTUS_TAG, "Cactus is running!!")
+            log("Cactus is running!!")
         }
     }
 }
@@ -187,15 +186,19 @@ internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
  */
 internal fun Context.registerWorker() {
     if (isServiceRunning) {
-        //注册新任务
-        val constraintsBuilder = Constraints.Builder()
-        constraintsBuilder.setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-        val workRequest =
-            PeriodicWorkRequest.Builder(CactusWorker::class.java, 15, TimeUnit.SECONDS)
-                .setConstraints(constraintsBuilder.build())
-                .addTag(Cactus.CACTUS_TAG)
-                .build()
-        WorkManager.getInstance(this).enqueue(workRequest)
+        try {
+            //注册新任务
+            val constraintsBuilder = Constraints.Builder()
+            constraintsBuilder.setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            val workRequest =
+                PeriodicWorkRequest.Builder(CactusWorker::class.java, 15, TimeUnit.SECONDS)
+                    .setConstraints(constraintsBuilder.build())
+                    .addTag(Cactus.CACTUS_TAG)
+                    .build()
+            WorkManager.getInstance(this).enqueue(workRequest)
+        } catch (e: Exception) {
+            log("WorkManager registration failed")
+        }
     }
 }
 
@@ -272,7 +275,7 @@ internal fun Context.startInternService(intent: Intent) {
 internal fun Context.startOnePixActivity() {
     if (!isScreenOn && Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
         mIsForeground = isForeground
-        Log.d(Cactus.CACTUS_TAG, "isForeground:$mIsForeground")
+        log("isForeground:$mIsForeground")
         val onePixIntent = Intent(this, OnePixActivity::class.java)
         onePixIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         onePixIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -443,4 +446,17 @@ internal fun IBinder.DeathRecipient.unlinkToDeath(
 ) {
     iInterface?.asBinder()?.unlinkToDeath(this, 0)
     block?.invoke()
+}
+
+/**
+ * 全局log
+ *
+ * @param msg String
+ */
+internal fun log(msg: String) {
+    sCactusConfig?.defaultConfig?.apply {
+        if (debug) {
+            Log.d(Cactus.CACTUS_TAG, msg)
+        }
+    }
 }

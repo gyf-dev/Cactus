@@ -4,7 +4,6 @@ import android.app.Service
 import android.content.*
 import android.media.MediaPlayer
 import android.os.IBinder
-import android.util.Log
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.ICactusInterface
@@ -369,17 +368,6 @@ class LocalService : Service(), IBinder.DeathRecipient {
                 mIsMusicRunning = false
                 log("music is pause")
             }
-        }
-    }
-
-    /**
-     * log输出
-     *
-     * @param msg String
-     */
-    private fun log(msg: String) {
-        if (mCactusConfig.defaultConfig.debug) {
-            Log.d(Cactus.CACTUS_TAG, msg)
         }
     }
 }

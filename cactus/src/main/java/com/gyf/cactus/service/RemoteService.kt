@@ -5,7 +5,6 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import android.util.Log
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.ICactusInterface
@@ -169,12 +168,6 @@ class RemoteService : Service(), IBinder.DeathRecipient {
                 mIsBind = false
             }
         } catch (e: Exception) {
-        }
-    }
-
-    private fun log(msg: String) {
-        if (mCactusConfig.defaultConfig.debug) {
-            Log.d(Cactus.CACTUS_TAG, msg)
         }
     }
 }
