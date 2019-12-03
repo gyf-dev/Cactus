@@ -177,14 +177,14 @@ class LocalService : Service(), IBinder.DeathRecipient {
                             pauseMusic()
                         }
                     }
-                    Cactus.CACTUS_BACKGROUND + packageName -> {
+                    Cactus.CACTUS_BACKGROUND -> {
                         log("background")
                         if (mCactusConfig.defaultConfig.backgroundMusicEnabled) {
                             playMusic()
                         }
                         onBackground(true)
                     }
-                    Cactus.CACTUS_FOREGROUND + packageName -> {
+                    Cactus.CACTUS_FOREGROUND -> {
                         log("foreground")
                         pauseMusic()
                         onBackground(false)
@@ -298,8 +298,8 @@ class LocalService : Service(), IBinder.DeathRecipient {
             registerReceiver(it, IntentFilter().apply {
                 addAction(Intent.ACTION_SCREEN_ON)
                 addAction(Intent.ACTION_SCREEN_OFF)
-                addAction(Cactus.CACTUS_BACKGROUND + packageName)
-                addAction(Cactus.CACTUS_FOREGROUND + packageName)
+                addAction(Cactus.CACTUS_BACKGROUND)
+                addAction(Cactus.CACTUS_FOREGROUND)
             })
         }
     }

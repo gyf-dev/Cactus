@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
+import android.os.Process
 import android.widget.RemoteViews
 import com.gyf.cactus.callback.CactusBackgroundCallback
 import com.gyf.cactus.callback.CactusCallback
@@ -20,7 +21,7 @@ import com.gyf.cactus.ext.unregister
 /**
  * Cactus保活方案，Cactus有两种形式处理回调事件，
  * 第一种使用CactusCallback，
- * 第二种注册CACTUS_WORK和CACTUS_STOP广播监听器
+ * 第二种注册CACTUS_WORK和CACTUS_STOP广播监听器。
  *
  * @author geyifeng
  * @date 2019-08-28 17:22
@@ -49,11 +50,11 @@ class Cactus private constructor() {
         /**
          * 后台回调广播ACTION
          */
-        const val CACTUS_BACKGROUND = "com.gyf.cactus.background"
+        val CACTUS_BACKGROUND = "com.gyf.cactus.background." + Process.myPid()
         /**
          * 前台后调广播ACTION
          */
-        const val CACTUS_FOREGROUND = "com.gyf.cactus.foreground"
+        val CACTUS_FOREGROUND = "com.gyf.cactus.foreground." + Process.myPid()
         /**
          * key，通过广播形式获取启动次数
          */

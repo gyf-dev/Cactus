@@ -91,14 +91,14 @@ class AppBackgroundCallback @JvmOverloads constructor(
             if (mFrontActivityCount == 0) {
                 mIsSend = false
                 sMainHandler.postDelayed {
-                    sendBroadcast(Intent().setAction(Cactus.CACTUS_BACKGROUND + packageName))
+                    sendBroadcast(Intent().setAction(Cactus.CACTUS_BACKGROUND))
                     block?.let { it(true) }
                 }
             } else {
                 if (!mIsSend) {
                     mIsSend = true
                     sMainHandler.postDelayed {
-                        sendBroadcast(Intent().setAction(Cactus.CACTUS_FOREGROUND + packageName))
+                        sendBroadcast(Intent().setAction(Cactus.CACTUS_FOREGROUND))
                         block?.let { it(false) }
                     }
                 }
