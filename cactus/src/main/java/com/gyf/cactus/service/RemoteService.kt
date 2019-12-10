@@ -112,7 +112,7 @@ class RemoteService : Service(), IBinder.DeathRecipient {
         registerStopReceiver {
             mIsStop = true
             sTimes = mConnectionTimes
-            stopSelf()
+            stopService()
         }
     }
 
@@ -150,7 +150,10 @@ class RemoteService : Service(), IBinder.DeathRecipient {
 
         override fun connectionTimes(time: Int) {
             mConnectionTimes = time
-            sTimes = time
+            if (mConnectionTimes > 4 && mConnectionTimes % 2 == 1) {
+                ++mConnectionTimes
+            }
+            sTimes = mConnectionTimes
         }
     }
 

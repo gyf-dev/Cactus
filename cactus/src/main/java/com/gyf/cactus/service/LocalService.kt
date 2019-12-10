@@ -116,7 +116,7 @@ class LocalService : Service(), IBinder.DeathRecipient {
         registerStopReceiver {
             mIsStop = true
             sTimes = mConnectionTimes
-            stopSelf()
+            stopService()
         }
     }
 
@@ -150,7 +150,10 @@ class LocalService : Service(), IBinder.DeathRecipient {
 
         override fun connectionTimes(time: Int) {
             mConnectionTimes = time
-            sTimes = time
+            if (mConnectionTimes > 3 && mConnectionTimes % 2 == 0) {
+                ++mConnectionTimes
+            }
+            sTimes = mConnectionTimes
             doWork((mConnectionTimes + 1) / 2)
         }
     }

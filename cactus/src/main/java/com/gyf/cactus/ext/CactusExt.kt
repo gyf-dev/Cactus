@@ -38,15 +38,19 @@ private var mWeakReference: WeakReference<Activity>? = null
  */
 private var mIsForeground = false
 /**
+ * 是否注册过
+ */
+private var sRegistered = false
+/**
+ * 前后台切换是否已经注册过
+ */
+private var sBackgroundRegistered = false
+/**
  * 主Handler
  */
 internal val sMainHandler by lazy {
     Handler(Looper.getMainLooper())
 }
-/**
- * 是否注册过
- */
-internal var sRegistered = false
 /**
  * 启动次数
  */
@@ -106,15 +110,20 @@ internal fun Context.registerStopReceiver(block: () -> Unit) =
 internal fun Context.register(cactusConfig: CactusConfig) {
     if (isMain) {
         try {
-            saveConfig(cactusConfig)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                registerJobCactus(cactusConfig)
-            } else {
-                registerCactus(cactusConfig)
-            }
-            if (this is Application && !sRegistered) {
-                registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
+            if (!sRegistered || !isServiceRunning) {
+                saveConfig(cactusConfig)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    registerJobCactus(cactusConfig)
+                } else {
+                    registerCactus(cactusConfig)
+                }
+                if (this is Application && !sBackgroundRegistered) {
+                    registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
+                    sBackgroundRegistered = true
+                }
                 sRegistered = true
+            } else {
+                log("Cactus is running，Please stop Cactus before registering!!")
             }
         } catch (e: Exception) {
             log("Unable to open cactus service!!")
@@ -133,7 +142,7 @@ internal fun Context.unregister() {
             action = Cactus.CACTUS_FLAG_STOP
         })
     } else {
-        log("Cactus is not running!!")
+        log("Cactus is not running，Please stop Cactus before restarting!!")
     }
 }
 
@@ -265,6 +274,20 @@ internal fun Context.startInternService(intent: Intent) {
     } else {
         startService(intent)
     }
+}
+
+/**
+ * 停止服务
+ *
+ * @receiver Service
+ */
+internal fun Service.stopService() {
+    sMainHandler.postDelayed({
+        try {
+            this.stopSelf()
+        } catch (e: Exception) {
+        }
+    }, 1000)
 }
 
 /**

@@ -64,7 +64,7 @@ class MainActivity : BaseActivity() {
         btnCrash.setOnClickListener {
             Toast.makeText(
                 this,
-                "The app will crash after three seconds(3s后退出)",
+                "The app will crash after three seconds(3s后奔溃)",
                 Toast.LENGTH_SHORT
             ).show()
             Handler().postDelayed({

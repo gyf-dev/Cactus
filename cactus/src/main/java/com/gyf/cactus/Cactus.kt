@@ -360,7 +360,7 @@ class Cactus private constructor() {
     }
 
     /**
-     * 注销
+     * 注销，并不会立马停止，而是在1s之后停止
      *
      * @param context Context
      */
