@@ -36,7 +36,7 @@ class CactusJobService : JobService() {
         mCactusConfig = getConfig()
         registerStopReceiver {
             mIsStop = true
-            stopSelf()
+            stopService()
         }
     }
 

@@ -13,10 +13,7 @@ import com.gyf.cactus.callback.CactusCallback
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.DefaultConfig
 import com.gyf.cactus.entity.NotificationConfig
-import com.gyf.cactus.ext.isServiceRunning
-import com.gyf.cactus.ext.register
-import com.gyf.cactus.ext.restart
-import com.gyf.cactus.ext.unregister
+import com.gyf.cactus.ext.*
 
 /**
  * Cactus保活方案，Cactus有两种形式处理回调事件，
@@ -380,5 +377,5 @@ class Cactus private constructor() {
     /**
      * 是否在运行
      */
-    fun isRunning(context: Context) = context.isServiceRunning
+    fun isRunning(context: Context) = context.isServiceRunning && sRegistered
 }

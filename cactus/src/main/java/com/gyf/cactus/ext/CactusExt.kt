@@ -40,7 +40,7 @@ private var mIsForeground = false
 /**
  * 是否注册过
  */
-private var sRegistered = false
+internal var sRegistered = false
 /**
  * 前后台切换是否已经注册过
  */
@@ -121,7 +121,6 @@ internal fun Context.register(cactusConfig: CactusConfig) {
                     registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
                     sBackgroundRegistered = true
                 }
-                sRegistered = true
             } else {
                 log("Cactus is running，Please stop Cactus before registering!!")
             }
@@ -137,12 +136,10 @@ internal fun Context.register(cactusConfig: CactusConfig) {
  * @receiver Context
  */
 internal fun Context.unregister() {
-    if (isServiceRunning) {
-        sendBroadcast(Intent().apply {
-            action = Cactus.CACTUS_FLAG_STOP
-        })
+    if (isServiceRunning && sRegistered) {
+        sendBroadcast(Intent(Cactus.CACTUS_FLAG_STOP))
     } else {
-        log("Cactus is not running，Please stop Cactus before restarting!!")
+        log("Cactus is not running，Please make sure Cactus is running!!")
     }
 }
 
@@ -151,15 +148,7 @@ internal fun Context.unregister() {
  *
  * @receiver Context
  */
-internal fun Context.restart() {
-    if (isMain) {
-        if (!isServiceRunning) {
-            register(getConfig())
-        } else {
-            log("Cactus is running!!")
-        }
-    }
-}
+internal fun Context.restart() = register(getConfig())
 
 /**
  * 最终都将调用此方法，注册Cactus服务
@@ -194,7 +183,7 @@ internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
  * @receiver Context
  */
 internal fun Context.registerWorker() {
-    if (isServiceRunning) {
+    if (isServiceRunning && sRegistered) {
         try {
             //注册新任务
             val constraintsBuilder = Constraints.Builder()
