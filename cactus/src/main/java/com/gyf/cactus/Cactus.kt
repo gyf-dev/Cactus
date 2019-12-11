@@ -361,18 +361,14 @@ class Cactus private constructor() {
      *
      * @param context Context
      */
-    fun unregister(context: Context) {
-        context.unregister()
-    }
+    fun unregister(context: Context) = context.unregister()
 
     /**
      * 重启
      *
      * @param context Context
      */
-    fun restart(context: Context) {
-        context.restart()
-    }
+    fun restart(context: Context) = context.restart()
 
     /**
      * 是否在运行
