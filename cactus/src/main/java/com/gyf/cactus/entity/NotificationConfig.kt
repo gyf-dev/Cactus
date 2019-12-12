@@ -50,7 +50,7 @@ data class NotificationConfig(
     /**
      * 是否隐藏 Android O以上通知栏
      */
-    var hideNotificationAfterO: Boolean = true,
+    var hideNotificationAfterO: Boolean = false,
     /**
      * 是否隐藏通知栏，对于 Android O以下有效
      */
