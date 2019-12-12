@@ -222,7 +222,6 @@ class LocalService : Service(), IBinder.DeathRecipient {
     private fun doWork(times: Int) {
         if (!mIsServiceRunning) {
             mIsServiceRunning = true
-            sRegistered = true
             log("LocalService is run >>>> do work times = $times")
             registerMedia()
             registerBroadcastReceiver()
@@ -246,7 +245,6 @@ class LocalService : Service(), IBinder.DeathRecipient {
     private fun onStop() {
         if (mIsServiceRunning) {
             mIsServiceRunning = false
-            sRegistered = false
             log("LocalService is stop!")
             unregisterReceiver()
             sendBroadcast(Intent(Cactus.CACTUS_STOP))

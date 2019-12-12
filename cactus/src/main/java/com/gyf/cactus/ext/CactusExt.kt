@@ -40,7 +40,7 @@ private var mIsForeground = false
 /**
  * 是否注册过
  */
-internal var sRegistered = false
+private var sRegistered = false
 /**
  * 前后台切换是否已经注册过
  */
@@ -121,6 +121,7 @@ internal fun Context.register(cactusConfig: CactusConfig) {
                     registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
                     sBackgroundRegistered = true
                 }
+                sRegistered = true
             } else {
                 log("Cactus is running，Please stop Cactus before registering!!")
             }
@@ -136,8 +137,9 @@ internal fun Context.register(cactusConfig: CactusConfig) {
  * @receiver Context
  */
 internal fun Context.unregister() {
-    if (isServiceRunning && sRegistered) {
+    if (isServiceRunning || sRegistered) {
         sendBroadcast(Intent(Cactus.CACTUS_FLAG_STOP))
+        sRegistered = false
     } else {
         log("Cactus is not running，Please make sure Cactus is running!!")
     }
@@ -183,7 +185,7 @@ internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
  * @receiver Context
  */
 internal fun Context.registerWorker() {
-    if (isServiceRunning && sRegistered) {
+    if (isServiceRunning) {
         try {
             //注册新任务
             val constraintsBuilder = Constraints.Builder()
@@ -399,7 +401,7 @@ internal val Context.isMain
  */
 internal val Context.isServiceRunning
     get() = run {
-        isServiceRunning("com.gyf.cactus.service.LocalService") and isRunningTaskExist(":cactusRemoteService")
+        isServiceRunning(LocalService::class.java.name) and isRunningTaskExist(":cactusRemoteService")
     }
 
 /**

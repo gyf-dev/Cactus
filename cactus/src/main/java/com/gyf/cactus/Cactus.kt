@@ -373,5 +373,5 @@ class Cactus private constructor() {
     /**
      * 是否在运行
      */
-    fun isRunning(context: Context) = context.isServiceRunning && sRegistered
+    fun isRunning(context: Context) = context.isServiceRunning
 }
