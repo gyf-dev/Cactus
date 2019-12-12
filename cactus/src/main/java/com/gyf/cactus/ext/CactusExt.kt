@@ -14,6 +14,7 @@ import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.callback.AppBackgroundCallback
 import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.exception.CactusUncaughtExceptionHandler
 import com.gyf.cactus.pix.OnePixActivity
 import com.gyf.cactus.receiver.StopReceiver
 import com.gyf.cactus.service.CactusJobService
@@ -112,6 +113,9 @@ internal fun Context.register(cactusConfig: CactusConfig) {
         try {
             if (!sRegistered || !isServiceRunning) {
                 saveConfig(cactusConfig)
+                if (cactusConfig.notificationConfig.hideNotificationAfterO) {
+                    CactusUncaughtExceptionHandler.instance
+                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     registerJobCactus(cactusConfig)
                 } else {

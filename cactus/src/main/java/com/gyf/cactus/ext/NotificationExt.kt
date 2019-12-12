@@ -97,10 +97,14 @@ private fun Context.getNotification(notificationConfig: NotificationConfig): Not
                 .setContentText(content)
                 .setSmallIcon(handleSmallIcon)
                 .setLargeIcon(
-                    largeIconBitmap ?: BitmapFactory.decodeResource(
-                        resources,
-                        largeIcon
-                    )
+                    largeIconBitmap ?: if (largeIcon == 0) {
+                        null
+                    } else {
+                        BitmapFactory.decodeResource(
+                            resources,
+                            largeIcon
+                        )
+                    }
                 )
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
