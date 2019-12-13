@@ -144,8 +144,10 @@ class RemoteService : Service(), IBinder.DeathRecipient {
 
         override fun wakeup(config: CactusConfig) {
             mCactusConfig = config
-            setNotification(mCactusConfig.notificationConfig)
-            mIsNotification = true
+            if (!mIsNotification) {
+                setNotification(mCactusConfig.notificationConfig)
+                mIsNotification = true
+            }
         }
 
         override fun connectionTimes(time: Int) {

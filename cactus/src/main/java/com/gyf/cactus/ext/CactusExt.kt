@@ -112,10 +112,9 @@ internal fun Context.register(cactusConfig: CactusConfig) {
     if (isMain) {
         try {
             if (!sRegistered || !isServiceRunning) {
+                sRegistered = true
                 saveConfig(cactusConfig)
-                if (cactusConfig.notificationConfig.hideNotificationAfterO) {
-                    CactusUncaughtExceptionHandler.instance
-                }
+                CactusUncaughtExceptionHandler.instance
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     registerJobCactus(cactusConfig)
                 } else {
@@ -125,7 +124,6 @@ internal fun Context.register(cactusConfig: CactusConfig) {
                     registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
                     sBackgroundRegistered = true
                 }
-                sRegistered = true
             } else {
                 log("Cactus is running，Please stop Cactus before registering!!")
             }
