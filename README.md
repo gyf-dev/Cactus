@@ -57,9 +57,9 @@
     -keep class com.gyf.cactus.entity.* {*;} 
    ```
 
-## api说明，<img src="warning.png" width="30" align=center /> 标识的建议用户修改，而不是使用默认值
+## api说明，<img src="warning.png" width="25" align=center /> 标识的建议用户修改，而不是使用默认值
   | api | 说明 | api | 说明 |
-  | :-------------: |:-------------:| :-------------:| :-------------:|
+  | :------------- |:-------------:| :------------- | :-------------:|
   | <img src="warning.png" width="15" align=center /> setChannelId | 渠道Id，默认是Cactus，建议用户修改，非必传 | <img src="warning.png" width="15" align=center /> setChannelName | 渠道名，用于设置里通知渠道展示，默认是Cactus，建议用户修改，非必传 |
   | <img src="warning.png" width="15" align=center /> setTitle | 通知栏标题，默认是Cactus，建议用户修改，非必传 | <img src="warning.png" width="15" align=center /> setContent |通知栏内容，默认是Cactus is running，建议用户修改，非必传 |
   | <img src="warning.png" width="15" align=center /> setSmallIcon | 通知栏小图标，默认是库里的图标，建议用户修改，非必传 | setLargeIcon  | 通知栏大图标，默认没有大图标，非必传 |
