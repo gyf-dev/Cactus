@@ -37,15 +37,11 @@
        isDebug(true)
        ... //其他api等
        ...
-       addCallback(object : CactusCallback {
-              override fun doWork(times:Int) {
-                           
-              }
-       
-              override fun onStop() {
-                          
-              }
-       })
+       addCallback({
+          //onStop回调，可以省略
+       }) { 
+          //doWork回调
+       }
     }
    ```
 - 注销 
