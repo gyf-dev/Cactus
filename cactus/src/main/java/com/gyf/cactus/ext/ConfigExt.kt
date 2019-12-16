@@ -2,8 +2,8 @@ package com.gyf.cactus.ext
 
 import android.content.Context
 import com.google.gson.Gson
-import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.Constant
 
 /**
  * 配置信息扩展
@@ -24,10 +24,10 @@ internal fun Context.saveConfig(cactusConfig: CactusConfig) {
     if (serviceId > 0) {
         cactusConfig.notificationConfig.serviceId = serviceId
     }
-    getSharedPreferences(Cactus.CACTUS_TAG, Context.MODE_PRIVATE).edit().apply {
-        putString(Cactus.CACTUS_CONFIG, Gson().toJson(cactusConfig))
+    getSharedPreferences(Constant.CACTUS_TAG, Context.MODE_PRIVATE).edit().apply {
+        putString(Constant.CACTUS_CONFIG, Gson().toJson(cactusConfig))
         if (serviceId <= 0) {
-            putInt(Cactus.CACTUS_SERVICE_ID, cactusConfig.notificationConfig.serviceId)
+            putInt(Constant.CACTUS_SERVICE_ID, cactusConfig.notificationConfig.serviceId)
         }
     }.apply()
 }
@@ -39,9 +39,9 @@ internal fun Context.saveConfig(cactusConfig: CactusConfig) {
  * @return CactusConfig
  */
 internal fun Context.getConfig() = sCactusConfig ?: getSharedPreferences(
-    Cactus.CACTUS_TAG,
+    Constant.CACTUS_TAG,
     Context.MODE_PRIVATE
-).getString(Cactus.CACTUS_CONFIG, null)?.run {
+).getString(Constant.CACTUS_CONFIG, null)?.run {
     Gson().fromJson(this, CactusConfig::class.java)
 } ?: CactusConfig()
 
@@ -52,6 +52,6 @@ internal fun Context.getConfig() = sCactusConfig ?: getSharedPreferences(
  * @return Int
  */
 private fun Context.getServiceId() = getSharedPreferences(
-    Cactus.CACTUS_TAG,
+    Constant.CACTUS_TAG,
     Context.MODE_PRIVATE
-).getInt(Cactus.CACTUS_SERVICE_ID, -1)
+).getInt(Constant.CACTUS_SERVICE_ID, -1)

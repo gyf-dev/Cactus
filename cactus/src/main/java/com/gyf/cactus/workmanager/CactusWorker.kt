@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.gyf.cactus.Cactus
+import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.ext.getConfig
 import com.gyf.cactus.ext.isServiceRunning
 import com.gyf.cactus.ext.register
@@ -28,7 +28,7 @@ class CactusWorker(val context: Context, workerParams: WorkerParameters) :
     init {
         context.registerStopReceiver {
             mIsStop = true
-            WorkManager.getInstance(context).cancelAllWorkByTag(Cactus.CACTUS_FLAG_STOP)
+            WorkManager.getInstance(context).cancelAllWorkByTag(Constant.CACTUS_FLAG_STOP)
         }
     }
 
@@ -38,7 +38,7 @@ class CactusWorker(val context: Context, workerParams: WorkerParameters) :
                 val cactusConfig = getConfig()
                 if (cactusConfig.defaultConfig.debug) {
                     Log.d(
-                        Cactus.CACTUS_TAG,
+                        Constant.CACTUS_TAG,
                         "CactusWorker-isServiceRunning:$isServiceRunning"
                     )
                 }

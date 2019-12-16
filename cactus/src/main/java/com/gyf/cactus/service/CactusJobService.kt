@@ -11,8 +11,8 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.ext.*
 
 /**
@@ -41,7 +41,7 @@ class CactusJobService : JobService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
+        intent?.getParcelableExtra<CactusConfig>(Constant.CACTUS_CONFIG)?.let {
             mCactusConfig = it
         }
         setNotification(mCactusConfig.notificationConfig)
@@ -58,7 +58,7 @@ class CactusJobService : JobService() {
     }
 
     override fun onStartJob(jobParameters: JobParameters): Boolean {
-        Log.d(Cactus.CACTUS_TAG, "onStartJob")
+        Log.d(Constant.CACTUS_TAG, "onStartJob")
         if (!isServiceRunning && !mIsStop) {
             registerCactus(mCactusConfig)
         }
@@ -66,7 +66,7 @@ class CactusJobService : JobService() {
     }
 
     override fun onStopJob(jobParameters: JobParameters): Boolean {
-        Log.d(Cactus.CACTUS_TAG, "onStopJob")
+        Log.d(Constant.CACTUS_TAG, "onStopJob")
         if (!isServiceRunning && !mIsStop) {
             registerCactus(mCactusConfig)
         }

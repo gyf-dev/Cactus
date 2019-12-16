@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import com.gyf.cactus.Cactus
+import com.gyf.cactus.entity.Constant
 
 /**
  * 注销服务监听
@@ -24,7 +24,7 @@ internal class StopReceiver private constructor(val context: Context) : Broadcas
     private var mBlock: (() -> Unit)? = null
 
     init {
-        context.registerReceiver(this, IntentFilter(Cactus.CACTUS_FLAG_STOP))
+        context.registerReceiver(this, IntentFilter(Constant.CACTUS_FLAG_STOP))
     }
 
     /**
@@ -39,7 +39,7 @@ internal class StopReceiver private constructor(val context: Context) : Broadcas
     override fun onReceive(context: Context?, intent: Intent?) {
         intent?.action?.also {
             when (it) {
-                Cactus.CACTUS_FLAG_STOP -> {
+                Constant.CACTUS_FLAG_STOP -> {
                     this.context.unregisterReceiver(this)
                     mBlock?.let {
                         it()

@@ -10,8 +10,8 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.gyf.cactus.Cactus
 import com.gyf.cactus.R
+import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.NotificationConfig
 import com.gyf.cactus.exception.CactusException
 import com.gyf.cactus.service.HideForegroundService
@@ -50,7 +50,7 @@ internal fun Service.setNotification(
     notificationConfig: NotificationConfig,
     isHideService: Boolean = false
 ) {
-    val tag = Cactus.CACTUS_TAG + System.identityHashCode(this)
+    val tag = Constant.CACTUS_TAG + System.identityHashCode(this)
     val hasNotification = mHasNotification[tag]
     if (hasNotification == null || !hasNotification) {
         mHasNotification[tag] = true
@@ -72,7 +72,7 @@ internal fun Service.setNotification(
                 } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
                     if (!isHideService) {
                         val intent = Intent(this@setNotification, HideForegroundService::class.java)
-                        intent.putExtra(Cactus.CACTUS_NOTIFICATION_CONFIG, this)
+                        intent.putExtra(Constant.CACTUS_NOTIFICATION_CONFIG, this)
                         startInternService(intent)
                     }
                 }

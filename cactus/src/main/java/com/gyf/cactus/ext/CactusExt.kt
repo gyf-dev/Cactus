@@ -14,6 +14,7 @@ import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.callback.AppBackgroundCallback
 import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.exception.CactusUncaughtExceptionHandler
 import com.gyf.cactus.pix.OnePixActivity
 import com.gyf.cactus.receiver.StopReceiver
@@ -140,7 +141,7 @@ internal fun Context.register(cactusConfig: CactusConfig) {
  */
 internal fun Context.unregister() {
     if (isServiceRunning || sRegistered) {
-        sendBroadcast(Intent(Cactus.CACTUS_FLAG_STOP))
+        sendBroadcast(Intent(Constant.CACTUS_FLAG_STOP))
         sRegistered = false
     } else {
         log("Cactus is not running，Please make sure Cactus is running!!")
@@ -162,10 +163,10 @@ internal fun Context.restart() = register(getConfig())
  */
 internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, LocalService::class.java)
-    intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
+    intent.putExtra(Constant.CACTUS_CONFIG, cactusConfig)
     startInternService(intent)
     //先取消上一次注册的任务
-    WorkManager.getInstance(this).cancelAllWorkByTag(Cactus.CACTUS_TAG)
+    WorkManager.getInstance(this).cancelAllWorkByTag(Constant.CACTUS_TAG)
     sMainHandler.postDelayed({ registerWorker() }, 5000)
 }
 
@@ -177,7 +178,7 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
  */
 internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, CactusJobService::class.java)
-    intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
+    intent.putExtra(Constant.CACTUS_CONFIG, cactusConfig)
     startInternService(intent)
 }
 
@@ -195,7 +196,7 @@ internal fun Context.registerWorker() {
             val workRequest =
                 PeriodicWorkRequest.Builder(CactusWorker::class.java, 15, TimeUnit.SECONDS)
                     .setConstraints(constraintsBuilder.build())
-                    .addTag(Cactus.CACTUS_TAG)
+                    .addTag(Constant.CACTUS_TAG)
                     .build()
             WorkManager.getInstance(this).enqueue(workRequest)
         } catch (e: Exception) {
@@ -247,7 +248,7 @@ private fun Service.startAndBindService(
     isStart: Boolean = true
 ) = run {
     val intent = Intent(this, cls)
-    intent.putExtra(Cactus.CACTUS_CONFIG, cactusConfig)
+    intent.putExtra(Constant.CACTUS_CONFIG, cactusConfig)
     if (isStart) {
         startInternService(intent)
     }
@@ -472,7 +473,7 @@ internal fun IBinder.DeathRecipient.unlinkToDeath(
 internal fun log(msg: String) {
     sCactusConfig?.defaultConfig?.apply {
         if (debug) {
-            Log.d(Cactus.CACTUS_TAG, msg)
+            Log.d(Constant.CACTUS_TAG, msg)
         }
     }
 }

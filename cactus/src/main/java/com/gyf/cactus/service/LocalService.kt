@@ -6,6 +6,7 @@ import android.media.MediaPlayer
 import android.os.IBinder
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.ICactusInterface
 import com.gyf.cactus.ext.*
 
@@ -121,7 +122,7 @@ class LocalService : Service(), IBinder.DeathRecipient {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
+        intent?.getParcelableExtra<CactusConfig>(Constant.CACTUS_CONFIG)?.let {
             mCactusConfig = it
         }
         setNotification(mCactusConfig.notificationConfig)
@@ -231,8 +232,8 @@ class LocalService : Service(), IBinder.DeathRecipient {
                     times
                 )
             )
-            if (Cactus.CALLBACKS.isNotEmpty()) {
-                Cactus.CALLBACKS.forEach {
+            if (Constant.CALLBACKS.isNotEmpty()) {
+                Constant.CALLBACKS.forEach {
                     it.doWork(times)
                 }
             }
@@ -250,8 +251,8 @@ class LocalService : Service(), IBinder.DeathRecipient {
             sendBroadcast(Intent(Cactus.CACTUS_STOP))
             pauseMusic()
             mMediaPlayer = null
-            if (Cactus.CALLBACKS.isNotEmpty()) {
-                Cactus.CALLBACKS.forEach {
+            if (Constant.CALLBACKS.isNotEmpty()) {
+                Constant.CALLBACKS.forEach {
                     it.onStop()
                 }
             }
@@ -285,8 +286,8 @@ class LocalService : Service(), IBinder.DeathRecipient {
      * @param background Boolean
      */
     private fun onBackground(background: Boolean) {
-        if (Cactus.BACKGROUND_CALLBACKS.isNotEmpty()) {
-            Cactus.BACKGROUND_CALLBACKS.forEach {
+        if (Constant.BACKGROUND_CALLBACKS.isNotEmpty()) {
+            Constant.BACKGROUND_CALLBACKS.forEach {
                 it.onBackground(background)
             }
         }

@@ -3,7 +3,7 @@ package com.gyf.cactus.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.gyf.cactus.Cactus
+import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.NotificationConfig
 import com.gyf.cactus.ext.sMainHandler
 import com.gyf.cactus.ext.setNotification
@@ -16,7 +16,7 @@ import com.gyf.cactus.ext.setNotification
 class HideForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getParcelableExtra<NotificationConfig>(Cactus.CACTUS_NOTIFICATION_CONFIG)
+        intent?.getParcelableExtra<NotificationConfig>(Constant.CACTUS_NOTIFICATION_CONFIG)
             ?.let {
                 setNotification(it, true)
             }

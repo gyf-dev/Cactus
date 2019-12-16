@@ -5,8 +5,8 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.ICactusInterface
 import com.gyf.cactus.exception.CactusUncaughtExceptionHandler
 import com.gyf.cactus.ext.*
@@ -119,7 +119,7 @@ class RemoteService : Service(), IBinder.DeathRecipient {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getParcelableExtra<CactusConfig>(Cactus.CACTUS_CONFIG)?.let {
+        intent?.getParcelableExtra<CactusConfig>(Constant.CACTUS_CONFIG)?.let {
             sCactusConfig = it
             mCactusConfig = it
         }

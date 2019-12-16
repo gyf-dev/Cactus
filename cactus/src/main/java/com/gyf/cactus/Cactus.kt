@@ -11,9 +11,13 @@ import android.widget.RemoteViews
 import com.gyf.cactus.callback.CactusBackgroundCallback
 import com.gyf.cactus.callback.CactusCallback
 import com.gyf.cactus.entity.CactusConfig
+import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.DefaultConfig
 import com.gyf.cactus.entity.NotificationConfig
-import com.gyf.cactus.ext.*
+import com.gyf.cactus.ext.isServiceRunning
+import com.gyf.cactus.ext.register
+import com.gyf.cactus.ext.restart
+import com.gyf.cactus.ext.unregister
 
 /**
  * Cactus保活方案，Cactus有两种形式处理回调事件，
@@ -26,10 +30,13 @@ import com.gyf.cactus.ext.*
 class Cactus private constructor() {
 
     /**
+     * 配置信息
+     */
+    private var mCactusConfig = CactusConfig()
+    /**
      * 通知栏信息
      */
     private var mNotificationConfig = NotificationConfig()
-
     /**
      * 默认配置信息
      */
@@ -47,26 +54,18 @@ class Cactus private constructor() {
         /**
          * 后台回调广播ACTION
          */
+        @JvmField
         val CACTUS_BACKGROUND = "com.gyf.cactus.background." + Process.myPid()
         /**
          * 前台后调广播ACTION
          */
+        @JvmField
         val CACTUS_FOREGROUND = "com.gyf.cactus.foreground." + Process.myPid()
         /**
          * key，通过广播形式获取启动次数
          */
         const val CACTUS_TIMES = "times"
-        /**
-         * 停止标识符
-         */
-        internal const val CACTUS_FLAG_STOP = "com.gyf.cactus.flag.stop"
-        internal const val CACTUS_TAG = "cactus"
-        internal const val CACTUS_CONFIG = "cactusConfig"
-        internal const val CACTUS_NOTIFICATION_CONFIG = "notificationConfig"
-        internal const val CACTUS_SERVICE_ID = "serviceId"
-        internal val CALLBACKS = arrayListOf<CactusCallback>()
-        internal val BACKGROUND_CALLBACKS = arrayListOf<CactusBackgroundCallback>()
-        private var mCactusConfig = CactusConfig()
+
         @JvmStatic
         val instance by lazy { Cactus() }
     }
@@ -295,7 +294,7 @@ class Cactus private constructor() {
      * @return Cactus
      */
     fun addCallback(cactusCallback: CactusCallback) = apply {
-        CALLBACKS.add(cactusCallback)
+        Constant.CALLBACKS.add(cactusCallback)
     }
 
     /**
@@ -306,7 +305,7 @@ class Cactus private constructor() {
      * @return Cactus
      */
     fun addCallback(stop: (() -> Unit)? = null, work: (Int) -> Unit) = apply {
-        CALLBACKS.add(object : CactusCallback {
+        Constant.CALLBACKS.add(object : CactusCallback {
             override fun doWork(times: Int) {
                 work(times)
             }
@@ -326,7 +325,7 @@ class Cactus private constructor() {
      * @return Cactus
      */
     fun addBackgroundCallback(cactusBackgroundCallback: CactusBackgroundCallback) = apply {
-        BACKGROUND_CALLBACKS.add(cactusBackgroundCallback)
+        Constant.BACKGROUND_CALLBACKS.add(cactusBackgroundCallback)
     }
 
     /**
@@ -336,7 +335,7 @@ class Cactus private constructor() {
      * @return Cactus
      */
     fun addBackgroundCallback(block: (Boolean) -> Unit) = apply {
-        BACKGROUND_CALLBACKS.add(object : CactusBackgroundCallback {
+        Constant.BACKGROUND_CALLBACKS.add(object : CactusBackgroundCallback {
             override fun onBackground(background: Boolean) {
                 block(background)
             }
