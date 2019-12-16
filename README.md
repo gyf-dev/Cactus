@@ -63,7 +63,7 @@
   | setNotification | 设置notification，非必传，如果不传，将使用用户根据其他api设置的信息构建Notification | setNotificationChannel |设置NotificationChannel，非必传，如果不传，将使用默认的NotificationChannel |
   | hideNotification | 是否隐藏通知栏，经测试，除了android 7.1手机之外都可以隐藏，默认隐藏，非必传 | hideNotificationAfterO |是否隐藏Android 8.0以上通知栏，默认隐藏 |
   | setPendingIntent | 设置PendingIntent，用来处理通知栏点击事件，非必传 | ☆setServiceId |服务Id，默认是1到Int.MAX_VALUE随机数，非必传 |
-  | ![框架流程图](warning.png){:height="30" width="30"} setChannelId | 渠道Id，默认是Cactus，建议用户修改，非必传 | ![框架流程图](warning.png)  setChannelName | 渠道名，用于设置里通知渠道展示，默认是Cactus，建议用户修改，非必传 |
+  | ![框架流程图](warning.png = 30x)setChannelId | 渠道Id，默认是Cactus，建议用户修改，非必传 | ![框架流程图](warning.png)  setChannelName | 渠道名，用于设置里通知渠道展示，默认是Cactus，建议用户修改，非必传 |
   | ![框架流程图](warning.png)  setTitle | 通知栏标题，默认是Cactus，建议用户修改，非必传 | ![框架流程图](warning.png)  setContent |通知栏内容，默认是Cactus is running，建议用户修改，非必传 |
   | setRemoteViews | 设置RemoteViews（自定义布局），非必传 | setBigRemoteViews |设置BigRemoteViews（自定义布局），非必传 |
   | ![框架流程图](warning.png)  setSmallIcon | 通知栏小图标，默认是库里的图标，建议用户修改，非必传 | setLargeIcon  | 通知栏大图标，默认没有大图标，非必传 |
