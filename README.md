@@ -66,7 +66,7 @@
   | ![框架流程图](warning.png = 30x)setChannelId | 渠道Id，默认是Cactus，建议用户修改，非必传 | ![框架流程图](warning.png)  setChannelName | 渠道名，用于设置里通知渠道展示，默认是Cactus，建议用户修改，非必传 |
   | ![框架流程图](warning.png)  setTitle | 通知栏标题，默认是Cactus，建议用户修改，非必传 | ![框架流程图](warning.png)  setContent |通知栏内容，默认是Cactus is running，建议用户修改，非必传 |
   | setRemoteViews | 设置RemoteViews（自定义布局），非必传 | setBigRemoteViews |设置BigRemoteViews（自定义布局），非必传 |
-  | ![框架流程图](warning.png)  setSmallIcon | 通知栏小图标，默认是库里的图标，建议用户修改，非必传 | setLargeIcon  | 通知栏大图标，默认没有大图标，非必传 |
+  | <img src="warning.png" width="30">  setSmallIcon | 通知栏小图标，默认是库里的图标，建议用户修改，非必传 | setLargeIcon  | 通知栏大图标，默认没有大图标，非必传 |
   | setMusicEnabled | 是否可以播放音乐，默认可以播放音乐，非必传 | setBackgroundMusicEnabled  | 后台是否可以播放音乐，默认不可以后台播放音乐，非必传 |
   | setMusicId | 设置自定义音乐，默认是无声音乐，该api只要在isDebug为true才会有生效，非必传 | setMusicInterval  | 设置音乐间隔时间，时间间隔越长，越省电，默认间隔时间是0，非必传 |
   | setOnePixEnabled | 是否可以使用一像素，默认可以使用，只有在android p以下可以使用，非必传 | isDebug  | 是否Debug模式，默认没有调试信息，非必传 |
