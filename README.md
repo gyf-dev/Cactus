@@ -57,13 +57,13 @@
     -keep class com.gyf.cactus.entity.* {*;} 
    ```
 
-## api说明，<img src="warning.png" width="25" align=center /> 标识的建议用户修改，而不是使用默认值
+## api说明，★ 标识的建议用户修改，而不是使用默认值
   | api | 说明 | api | 说明 |
   | :------------- |:-------------:| :------------- | :-------------:|
-  | <img src="warning.png" width="15" align=center /> setChannelId | 渠道Id，默认是Cactus，建议用户修改，非必传 | <img src="warning.png" width="15" align=center /> setChannelName | 渠道名，用于设置里通知渠道展示，默认是Cactus，建议用户修改，非必传 |
-  | <img src="warning.png" width="15" align=center /> setTitle | 通知栏标题，默认是Cactus，建议用户修改，非必传 | <img src="warning.png" width="15" align=center /> setContent |通知栏内容，默认是Cactus is running，建议用户修改，非必传 |
-  | <img src="warning.png" width="15" align=center /> setSmallIcon | 通知栏小图标，默认是库里的图标，建议用户修改，非必传 | setLargeIcon  | 通知栏大图标，默认没有大图标，非必传 |
-  | <img src="warning.png" width="15" align=center /> setServiceId | 服务Id，默认是1到Int.MAX_VALUE随机数，非必传 | setPendingIntent | 设置PendingIntent，用来处理通知栏点击事件，非必传 |
+  | ★ setChannelId | 渠道Id，默认是Cactus，建议用户修改，非必传 | ★ setChannelName | 渠道名，用于设置里通知渠道展示，默认是Cactus，建议用户修改，非必传 |
+  | ★ setTitle | 通知栏标题，默认是Cactus，建议用户修改，非必传 | ★ setContent |通知栏内容，默认是Cactus is running，建议用户修改，非必传 |
+  | ★ setSmallIcon | 通知栏小图标，默认是库里的图标，建议用户修改，非必传 | setLargeIcon  | 通知栏大图标，默认没有大图标，非必传 |
+  | ★ setServiceId | 服务Id，默认是1到Int.MAX_VALUE随机数，非必传 | setPendingIntent | 设置PendingIntent，用来处理通知栏点击事件，非必传 |
   | setNotification | 设置notification，非必传，如果不传，将使用用户根据其他api设置的信息构建Notification | setNotificationChannel |设置NotificationChannel，非必传，如果不传，将使用默认的NotificationChannel |
   | hideNotification | 是否隐藏通知栏，经测试，除了android 7.1手机之外都可以隐藏，默认隐藏，非必传 | hideNotificationAfterO |是否隐藏Android 8.0以上通知栏，默认隐藏 |
   | setRemoteViews | 设置RemoteViews（自定义布局），非必传 | setBigRemoteViews |设置BigRemoteViews（自定义布局），非必传 |
