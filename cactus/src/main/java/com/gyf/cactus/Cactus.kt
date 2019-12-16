@@ -72,7 +72,7 @@ class Cactus private constructor() {
     }
 
     /**
-     * 设置notification，非必传，如果不传，将使用用户根据api设置的信息构建Notification
+     * 设置notification，非必传，如果不传，将使用用户根据其他api设置的信息构建Notification
      *
      * @param notification Notification
      * @return Cactus
@@ -364,7 +364,7 @@ class Cactus private constructor() {
     fun unregister(context: Context) = context.unregister()
 
     /**
-     * 重启
+     * 重启，与register区别在于不会重新配置CactusConfig信息，而是使用上一次配置的信息
      *
      * @param context Context
      */

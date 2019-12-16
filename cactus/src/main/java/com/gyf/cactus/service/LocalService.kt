@@ -248,6 +248,8 @@ class LocalService : Service(), IBinder.DeathRecipient {
             log("LocalService is stop!")
             unregisterReceiver()
             sendBroadcast(Intent(Cactus.CACTUS_STOP))
+            pauseMusic()
+            mMediaPlayer = null
             if (Cactus.CALLBACKS.isNotEmpty()) {
                 Cactus.CALLBACKS.forEach {
                     it.onStop()

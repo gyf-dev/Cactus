@@ -8,6 +8,7 @@ import android.os.IBinder
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.ICactusInterface
+import com.gyf.cactus.exception.CactusUncaughtExceptionHandler
 import com.gyf.cactus.ext.*
 import java.lang.ref.WeakReference
 
@@ -100,6 +101,7 @@ class RemoteService : Service(), IBinder.DeathRecipient {
 
     override fun onCreate() {
         super.onCreate()
+        CactusUncaughtExceptionHandler.instance
         mCactusConfig = getConfig()
         sMainHandler.postDelayed({
             if (!mIsNotification) {
