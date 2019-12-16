@@ -357,7 +357,7 @@ class Cactus private constructor() {
     }
 
     /**
-     * 注销，并不会立马停止，而是在1s之后停止
+     * 注销，并不会立马停止，而是在1s之后停止，非必须调用，比如可以在app完全退出的时候可以调用，根据你的需求调用
      *
      * @param context Context
      */
