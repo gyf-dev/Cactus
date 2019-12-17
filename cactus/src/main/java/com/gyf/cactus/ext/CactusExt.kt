@@ -142,7 +142,7 @@ internal fun Context.register(cactusConfig: CactusConfig) {
 internal fun Context.unregister() {
     if (isServiceRunning || sRegistered) {
         sendBroadcast(Intent(Constant.CACTUS_FLAG_STOP))
-        sRegistered = false
+        sMainHandler.postDelayed({ sRegistered = false }, 1000)
     } else {
         log("Cactus is not running，Please make sure Cactus is running!!")
     }
