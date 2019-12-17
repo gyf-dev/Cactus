@@ -1,6 +1,6 @@
 ## [点我下载demo](https://www.pgyer.com/Cactus)(密码：cactus)
 
-## 写在前面
+## 注意！注意！注意！写在前面
   如果你项目里使用了Thread.UncaughtExceptionHandler或者第三方异常捕获库，比如友盟，bugly等，Cactus请在Thread.UncaughtExceptionHandler或者第三方异常捕获库，比如友盟，bugly等之后注册使用，并且建议在Application里注册使用
 
 ## 使用 
