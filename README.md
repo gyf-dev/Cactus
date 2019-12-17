@@ -70,7 +70,7 @@
   | setRemoteViews | 设置RemoteViews（自定义布局），非必传 | setBigRemoteViews |设置BigRemoteViews（自定义布局），非必传 |
   | hideNotification | 是否隐藏通知栏，经测试，除了android 7.1手机之外都可以隐藏，默认隐藏，非必传 | hideNotificationAfterO |是否隐藏Android 8.0以上通知栏，默认隐藏 |
   | setMusicEnabled | 是否可以播放音乐，默认可以播放音乐，非必传 | setBackgroundMusicEnabled  | 后台是否可以播放音乐，默认不可以后台播放音乐，非必传 |
-  | setMusicId | 设置自定义音乐，默认是无声音乐，该api只要在isDebug为true才会有生效，非必传 | setMusicInterval  | 设置音乐间隔时间，时间间隔越长，越省电，默认间隔时间是0，非必传 |
+  | setMusicId | 设置自定义音乐，默认是无声音乐，该api只要在isDebug为true才会有生效，非必传 | ★ setMusicInterval  | 设置音乐间隔时间，时间间隔越长，越省电，默认间隔时间是0，非必传 |
   | setOnePixEnabled | 是否可以使用一像素，默认可以使用，只有在android p以下可以使用，非必传 | isDebug  | 是否Debug模式，默认没有调试信息，非必传 |
   | setNotification | 设置notification，非必传，如果不传，将使用用户根据其他api设置的信息构建Notification | setNotificationChannel |设置NotificationChannel，非必传，如果不传，将使用默认的NotificationChannel |
   | register | 必须调用，建议在Application里初始化，使用Kotlin扩展函数不需要调用此方法 | unregister  | 注销，并不会立马停止，而是在1s之后停止，非必须调用，比如可以在app完全退出的时候可以调用，根据你的需求调用 |
