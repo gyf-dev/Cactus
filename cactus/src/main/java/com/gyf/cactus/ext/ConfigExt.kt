@@ -13,14 +13,37 @@ import com.gyf.cactus.entity.Constant
  */
 
 /**
+ * 保存Stop标识符
+ *
+ * @receiver Context
+ * @param boolean Boolean
+ */
+internal fun Context.saveStopFlag(boolean: Boolean) {
+    getSharedPreferences(Constant.CACTUS_TAG, Context.MODE_PRIVATE).edit().apply {
+        putBoolean(Constant.CACTUS_FLAG_STOP, boolean)
+    }.apply()
+}
+
+/**
+ * 获得Stop标识符
+ *
+ * @receiver Context
+ */
+internal fun Context.isStopFlag() = getSharedPreferences(
+    Constant.CACTUS_TAG,
+    Context.MODE_PRIVATE
+).getBoolean(Constant.CACTUS_FLAG_STOP, false)
+
+/**
  * 保存配置信息
  *
  * @receiver Context
  * @param cactusConfig CactusConfig
  */
 internal fun Context.saveConfig(cactusConfig: CactusConfig) {
-    val serviceId = getServiceId()
     sCactusConfig = cactusConfig
+    saveStopFlag(false)
+    val serviceId = getServiceId()
     if (serviceId > 0) {
         cactusConfig.notificationConfig.serviceId = serviceId
     }

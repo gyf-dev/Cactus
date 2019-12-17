@@ -9,9 +9,13 @@ import com.gyf.cactus.callback.CactusCallback
  */
 internal object Constant {
     /**
+     * 包名
+     */
+    internal const val CACTUS_PACKAGE = "com.gyf.cactus"
+    /**
      * 停止标识符
      */
-    internal const val CACTUS_FLAG_STOP = "com.gyf.cactus.flag.stop"
+    internal const val CACTUS_FLAG_STOP = "$CACTUS_PACKAGE.flag.stop"
     /**
      * tag
      */

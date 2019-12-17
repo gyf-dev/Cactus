@@ -141,6 +141,7 @@ internal fun Context.register(cactusConfig: CactusConfig) {
  */
 internal fun Context.unregister() {
     if (isServiceRunning || sRegistered) {
+        saveStopFlag(true)
         sendBroadcast(Intent(Constant.CACTUS_FLAG_STOP))
         sMainHandler.postDelayed({ sRegistered = false }, 1000)
     } else {

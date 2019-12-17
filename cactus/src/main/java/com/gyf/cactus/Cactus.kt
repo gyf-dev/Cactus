@@ -46,27 +46,31 @@ class Cactus private constructor() {
         /**
          * 运行时回调广播ACTION
          */
-        const val CACTUS_WORK = "com.gyf.cactus.work"
+        @JvmField
+        val CACTUS_WORK = "work".field
         /**
          * 停止时回调广播ACTION
          */
-        const val CACTUS_STOP = "com.gyf.cactus.stop"
+        @JvmField
+        val CACTUS_STOP = "stop".field
         /**
          * 后台回调广播ACTION
          */
         @JvmField
-        val CACTUS_BACKGROUND = "com.gyf.cactus.background." + Process.myPid()
+        val CACTUS_BACKGROUND = "background".field
         /**
          * 前台后调广播ACTION
          */
         @JvmField
-        val CACTUS_FOREGROUND = "com.gyf.cactus.foreground." + Process.myPid()
+        val CACTUS_FOREGROUND = "foreground".field
         /**
          * key，通过广播形式获取启动次数
          */
         const val CACTUS_TIMES = "times"
         @JvmStatic
         val instance by lazy { Cactus() }
+
+        private val String.field get() = "${Constant.CACTUS_PACKAGE}.${this}.${Process.myPid()}"
     }
 
     /**

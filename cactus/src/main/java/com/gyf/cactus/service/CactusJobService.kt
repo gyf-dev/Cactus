@@ -58,7 +58,7 @@ class CactusJobService : JobService() {
 
     override fun onStartJob(jobParameters: JobParameters): Boolean {
         log("onStartJob")
-        if (!isServiceRunning && !mIsStop) {
+        if (!isServiceRunning && !mIsStop && !isStopFlag()) {
             registerCactus(mCactusConfig)
         }
         return false
@@ -66,7 +66,7 @@ class CactusJobService : JobService() {
 
     override fun onStopJob(jobParameters: JobParameters): Boolean {
         log("onStopJob")
-        if (!isServiceRunning && !mIsStop) {
+        if (!isServiceRunning && !mIsStop && !isStopFlag()) {
             registerCactus(mCactusConfig)
         }
         return false

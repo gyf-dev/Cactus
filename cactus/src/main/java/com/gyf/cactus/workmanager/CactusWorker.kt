@@ -29,7 +29,7 @@ class CactusWorker(val context: Context, workerParams: WorkerParameters) :
     }
 
     override fun doWork(): Result {
-        return if (!mIsStop) {
+        return if (!mIsStop && !context.isStopFlag()) {
             context.apply {
                 val cactusConfig = getConfig()
                 if (cactusConfig.defaultConfig.debug) {
