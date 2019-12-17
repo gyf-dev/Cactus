@@ -65,7 +65,6 @@ class Cactus private constructor() {
          * key，通过广播形式获取启动次数
          */
         const val CACTUS_TIMES = "times"
-
         @JvmStatic
         val instance by lazy { Cactus() }
     }
