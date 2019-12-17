@@ -1,13 +1,13 @@
 ## [点我下载demo](https://www.pgyer.com/Cactus)(密码：cactus)
 
+## 写在前面
+  如果你项目里使用了Thread.UncaughtExceptionHandler或者第三方异常捕获库，比如友盟，bugly等，Cactus请在Thread.UncaughtExceptionHandler或者第三方异常捕获库，比如友盟，bugly等之后注册使用，并且建议在Application里注册使用
+
 ## 使用 
 > android studio
    ```groovy
    implementation 'com.gyf.cactus:cactus:1.1.3-beta05'
    ```
-## 写在前面
-  如果你项目里使用了Thread.UncaughtExceptionHandler或者第三方异常捕获库，比如友盟，bugly等，Cactus请在Thread.UncaughtExceptionHandler或者第三方异常捕获库，比如友盟，bugly等之后注册使用，并且建议在Application里注册使用
-
 ## 用法（具体api请参考api说明）
 #### java用法
 
