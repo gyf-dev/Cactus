@@ -377,9 +377,14 @@ internal val Context.isCactusRunning
     }
 
 /**
- * 获得带pid值的字段值
+ * 获得带id值的字段值
  */
-internal val String.fieldByPid get() = "${Constant.CACTUS_PACKAGE}.${this}.${Process.myPid()}"
+internal val String.fieldById get() = "${Constant.CACTUS_PACKAGE}.${this}.$id"
+
+/**
+ * 获取id
+ */
+internal val id get() = if (Process.myUid() <= 0) Process.myPid() else Process.myUid()
 
 /**
  * 解除DeathRecipient绑定

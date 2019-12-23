@@ -43,22 +43,22 @@ class Cactus private constructor() {
          * 运行时回调广播ACTION
          */
         @JvmField
-        val CACTUS_WORK = "work".fieldByPid
+        val CACTUS_WORK = "work".fieldById
         /**
          * 停止时回调广播ACTION
          */
         @JvmField
-        val CACTUS_STOP = "stop".fieldByPid
+        val CACTUS_STOP = "stop".fieldById
         /**
          * 后台回调广播ACTION
          */
         @JvmField
-        val CACTUS_BACKGROUND = "background".fieldByPid
+        val CACTUS_BACKGROUND = "background".fieldById
         /**
          * 前台后调广播ACTION
          */
         @JvmField
-        val CACTUS_FOREGROUND = "foreground".fieldByPid
+        val CACTUS_FOREGROUND = "foreground".fieldById
         /**
          * key，通过广播形式获取启动次数
          */
