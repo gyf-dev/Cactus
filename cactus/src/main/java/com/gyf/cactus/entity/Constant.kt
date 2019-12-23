@@ -33,6 +33,14 @@ internal object Constant {
      */
     internal const val CACTUS_SERVICE_ID = "serviceId"
     /**
+     * JobID key
+     */
+    internal const val CACTUS_JOB_ID = "jobId"
+    /**
+     * 进程名字
+     */
+    internal const val CACTUS_EMOTE_SERVICE = "cactusRemoteService"
+    /**
      * 回调集合
      */
     internal val CALLBACKS = arrayListOf<CactusCallback>()

@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
-import android.os.Process
 import android.widget.RemoteViews
 import com.gyf.cactus.callback.CactusBackgroundCallback
 import com.gyf.cactus.callback.CactusCallback
@@ -14,10 +13,7 @@ import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.DefaultConfig
 import com.gyf.cactus.entity.NotificationConfig
-import com.gyf.cactus.ext.isServiceRunning
-import com.gyf.cactus.ext.register
-import com.gyf.cactus.ext.restart
-import com.gyf.cactus.ext.unregister
+import com.gyf.cactus.ext.*
 
 /**
  * Cactus保活方案，Cactus有两种形式处理回调事件，
@@ -47,30 +43,28 @@ class Cactus private constructor() {
          * 运行时回调广播ACTION
          */
         @JvmField
-        val CACTUS_WORK = "work".field
+        val CACTUS_WORK = "work".fieldByPid
         /**
          * 停止时回调广播ACTION
          */
         @JvmField
-        val CACTUS_STOP = "stop".field
+        val CACTUS_STOP = "stop".fieldByPid
         /**
          * 后台回调广播ACTION
          */
         @JvmField
-        val CACTUS_BACKGROUND = "background".field
+        val CACTUS_BACKGROUND = "background".fieldByPid
         /**
          * 前台后调广播ACTION
          */
         @JvmField
-        val CACTUS_FOREGROUND = "foreground".field
+        val CACTUS_FOREGROUND = "foreground".fieldByPid
         /**
          * key，通过广播形式获取启动次数
          */
         const val CACTUS_TIMES = "times"
         @JvmStatic
         val instance by lazy { Cactus() }
-
-        private val String.field get() = "${Constant.CACTUS_PACKAGE}.${this}.${Process.myPid()}"
     }
 
     /**
@@ -375,5 +369,5 @@ class Cactus private constructor() {
     /**
      * 是否在运行
      */
-    fun isRunning(context: Context) = context.isServiceRunning
+    fun isRunning(context: Context) = context.isCactusRunning
 }

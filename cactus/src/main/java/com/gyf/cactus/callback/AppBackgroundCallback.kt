@@ -38,6 +38,10 @@ class AppBackgroundCallback @JvmOverloads constructor(
      * 是否是第一次发送前后台广播
      */
     private var mIsFirst = true
+    /**
+     * 是否使用监听回调
+     */
+    private var mUseCallback = true
 
     companion object {
         private const val FIRST_TIME = 1000L
@@ -83,23 +87,29 @@ class AppBackgroundCallback @JvmOverloads constructor(
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
     }
 
+    internal fun useCallback(useCallback: Boolean) {
+        mUseCallback = useCallback
+    }
+
     /**
      * 处理广播
      */
     private fun post() {
         (mContext?.get() ?: context)?.apply {
-            if (mFrontActivityCount == 0) {
-                mIsSend = false
-                sMainHandler.postDelayed {
-                    sendBroadcast(Intent().setAction(Cactus.CACTUS_BACKGROUND))
-                    block?.let { it(true) }
-                }
-            } else {
-                if (!mIsSend) {
-                    mIsSend = true
+            if (mUseCallback) {
+                if (mFrontActivityCount == 0) {
+                    mIsSend = false
                     sMainHandler.postDelayed {
-                        sendBroadcast(Intent().setAction(Cactus.CACTUS_FOREGROUND))
-                        block?.let { it(false) }
+                        sendBroadcast(Intent().setAction(Cactus.CACTUS_BACKGROUND))
+                        block?.let { it(true) }
+                    }
+                } else {
+                    if (!mIsSend) {
+                        mIsSend = true
+                        sMainHandler.postDelayed {
+                            sendBroadcast(Intent().setAction(Cactus.CACTUS_FOREGROUND))
+                            block?.let { it(false) }
+                        }
                     }
                 }
             }

@@ -1,14 +1,15 @@
 package com.gyf.cactus.ext
 
-import android.annotation.SuppressLint
-import android.app.*
+import android.app.Activity
+import android.app.Application
+import android.app.PendingIntent
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
 import android.util.Log
-import androidx.work.Constraints
-import androidx.work.NetworkType
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.gyf.cactus.Cactus
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Cactus扩展
+ *
  * @author geyifeng
  * @date 2019-08-28 18:23
  */
@@ -44,10 +46,6 @@ private var mIsForeground = false
  */
 private var sRegistered = false
 /**
- * 前后台切换是否已经注册过
- */
-private var sBackgroundRegistered = false
-/**
  * 主Handler
  */
 internal val sMainHandler by lazy {
@@ -61,6 +59,10 @@ internal var sTimes = 0
  * 配置信息
  */
 internal var sCactusConfig: CactusConfig? = null
+/**
+ * 前后台切换监听
+ */
+private var mAppBackgroundCallback: AppBackgroundCallback? = null
 
 /**
  * kotlin里使用Cactus
@@ -112,7 +114,9 @@ internal fun Context.registerStopReceiver(block: () -> Unit) =
 internal fun Context.register(cactusConfig: CactusConfig) {
     if (isMain) {
         try {
-            if (!sRegistered || !isServiceRunning) {
+            if (sRegistered && isCactusRunning) {
+                log("Cactus is running，Please stop Cactus before registering!!")
+            } else {
                 sRegistered = true
                 saveConfig(cactusConfig)
                 CactusUncaughtExceptionHandler.instance
@@ -121,12 +125,11 @@ internal fun Context.register(cactusConfig: CactusConfig) {
                 } else {
                     registerCactus(cactusConfig)
                 }
-                if (this is Application && !sBackgroundRegistered) {
-                    registerActivityLifecycleCallbacks(AppBackgroundCallback(this))
-                    sBackgroundRegistered = true
+                if (this is Application && mAppBackgroundCallback == null) {
+                    mAppBackgroundCallback = AppBackgroundCallback(this)
+                    registerActivityLifecycleCallbacks(mAppBackgroundCallback)
                 }
-            } else {
-                log("Cactus is running，Please stop Cactus before registering!!")
+                mAppBackgroundCallback?.useCallback(true)
             }
         } catch (e: Exception) {
             log("Unable to open cactus service!!")
@@ -140,12 +143,24 @@ internal fun Context.register(cactusConfig: CactusConfig) {
  * @receiver Context
  */
 internal fun Context.unregister() {
-    if (isServiceRunning || sRegistered) {
-        saveStopFlag(true)
-        sendBroadcast(Intent(Constant.CACTUS_FLAG_STOP))
-        sMainHandler.postDelayed({ sRegistered = false }, 1000)
-    } else {
-        log("Cactus is not running，Please make sure Cactus is running!!")
+    try {
+        if (isCactusRunning && sRegistered) {
+            sRegistered = false
+            unregisterWorker()
+            sendBroadcast(Intent("${Constant.CACTUS_FLAG_STOP}.$packageName"))
+            sMainHandler.postDelayed({
+                mAppBackgroundCallback?.also {
+                    it.useCallback(false)
+                    if (this is Application) {
+                        unregisterActivityLifecycleCallbacks(it)
+                        mAppBackgroundCallback = null
+                    }
+                }
+            }, 1000)
+        } else {
+            log("Cactus is not running，Please make sure Cactus is running!!")
+        }
+    } catch (e: Exception) {
     }
 }
 
@@ -166,8 +181,6 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, LocalService::class.java)
     intent.putExtra(Constant.CACTUS_CONFIG, cactusConfig)
     startInternService(intent)
-    //先取消上一次注册的任务
-    WorkManager.getInstance(this).cancelAllWorkByTag(Constant.CACTUS_TAG)
     sMainHandler.postDelayed({ registerWorker() }, 5000)
 }
 
@@ -189,22 +202,31 @@ internal fun Context.registerJobCactus(cactusConfig: CactusConfig) {
  * @receiver Context
  */
 internal fun Context.registerWorker() {
-    if (isServiceRunning) {
+    if (isCactusRunning && sRegistered) {
         try {
-            //注册新任务
-            val constraintsBuilder = Constraints.Builder()
-            constraintsBuilder.setRequiredNetworkType(NetworkType.NOT_REQUIRED)
             val workRequest =
                 PeriodicWorkRequest.Builder(CactusWorker::class.java, 15, TimeUnit.SECONDS)
-                    .setConstraints(constraintsBuilder.build())
-                    .addTag(Constant.CACTUS_TAG)
                     .build()
-            WorkManager.getInstance(this).enqueue(workRequest)
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                CactusWorker::class.java.name,
+                ExistingPeriodicWorkPolicy.REPLACE,
+                workRequest
+            )
         } catch (e: Exception) {
+            unregisterWorker()
             log("WorkManager registration failed")
         }
     }
 }
+
+/**
+ * 取消WorkManager
+ *
+ * @receiver Context
+ * @return Operation
+ */
+internal fun Context.unregisterWorker() =
+    WorkManager.getInstance(this).cancelUniqueWork(CactusWorker::class.java.name)
 
 /**
  * 开启远程服务
@@ -347,109 +369,17 @@ internal fun backBackground() {
 }
 
 /**
- * 是否在前台
+ * WaterBear是否在运行中
  */
-internal val Context.isForeground
-    @SuppressLint("NewApi")
+internal val Context.isCactusRunning
     get() = run {
-        var foreground = false
-        val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val tasks = am.getRunningTasks(1)
-        tasks?.apply {
-            if (isNotEmpty()) {
-                this[0].topActivity?.let {
-                    foreground = (it.packageName == packageName)
-                }
-            }
-        }
-        foreground
+        isServiceRunning(LocalService::class.java.name) and isRunningTaskExist(Constant.CACTUS_EMOTE_SERVICE)
     }
 
 /**
- * 屏幕是否亮屏
+ * 获得带pid值的字段值
  */
-internal val Context.isScreenOn
-    get() = run {
-        try {
-            val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
-            pm.isScreenOn
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-/**
- * 是否主进程
- */
-internal val Context.isMain
-    get() = run {
-        val pid = Process.myPid()
-        var processName = ""
-        val mActivityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        if (mActivityManager.runningAppProcesses != null) {
-            for (appProcess in mActivityManager.runningAppProcesses) {
-                if (appProcess.pid == pid) {
-                    processName = appProcess.processName
-                    break
-                }
-            }
-            if (processName == packageName) {
-                return@run true
-            }
-        }
-        false
-    }
-
-/**
- * Cactus是否在运行中
- */
-internal val Context.isServiceRunning
-    get() = run {
-        isServiceRunning(LocalService::class.java.name) and isRunningTaskExist(":cactusRemoteService")
-    }
-
-/**
- * 判断服务是否在运行
- *
- * @receiver Context
- * @param className String
- * @return Boolean
- */
-internal fun Context.isServiceRunning(className: String): Boolean {
-    var isRunning = false
-    val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    val servicesList = activityManager.getRunningServices(Integer.MAX_VALUE)
-    if (servicesList != null) {
-        val l = servicesList.iterator()
-        while (l.hasNext()) {
-            val si = l.next()
-            if (className == si.service.className) {
-                isRunning = true
-            }
-        }
-    }
-    return isRunning
-}
-
-/**
- * 判断任务是否在运行
- *
- * @receiver Context
- * @param processName String
- * @return Boolean
- */
-internal fun Context.isRunningTaskExist(processName: String): Boolean {
-    val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    val processList = am.runningAppProcesses
-    if (processList != null) {
-        for (info in processList) {
-            if (info.processName.contains(processName)) {
-                return true
-            }
-        }
-    }
-    return false
-}
+internal val String.fieldByPid get() = "${Constant.CACTUS_PACKAGE}.${this}.${Process.myPid()}"
 
 /**
  * 解除DeathRecipient绑定
@@ -476,5 +406,5 @@ internal fun log(msg: String) {
         if (debug) {
             Log.d(Constant.CACTUS_TAG, msg)
         }
-    }
+    } ?: Log.v(Constant.CACTUS_TAG, msg)
 }

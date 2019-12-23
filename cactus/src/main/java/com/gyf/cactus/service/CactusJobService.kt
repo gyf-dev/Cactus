@@ -9,6 +9,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Process
 import androidx.annotation.RequiresApi
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.Constant
@@ -21,9 +22,11 @@ import com.gyf.cactus.ext.*
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 class CactusJobService : JobService() {
 
+    private lateinit var mJobScheduler: JobScheduler
+
     private lateinit var mCactusConfig: CactusConfig
 
-    private val jobId = 100
+    private var mJobId = 100
 
     /**
      * 停止标识符
@@ -33,6 +36,7 @@ class CactusJobService : JobService() {
     override fun onCreate() {
         super.onCreate()
         mCactusConfig = getConfig()
+        registerJob()
         registerStopReceiver {
             mIsStop = true
             stopService()
@@ -45,20 +49,19 @@ class CactusJobService : JobService() {
         }
         setNotification(mCactusConfig.notificationConfig)
         registerCactus(mCactusConfig)
-        startJob()
         return Service.START_STICKY
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         stopForeground(true)
-        val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobScheduler.cancel(jobId)
+        mJobScheduler.cancel(mJobId)
+        saveJobId(-1)
+        super.onDestroy()
     }
 
     override fun onStartJob(jobParameters: JobParameters): Boolean {
         log("onStartJob")
-        if (!isServiceRunning && !mIsStop && !isStopFlag()) {
+        if (!isCactusRunning && !mIsStop) {
             registerCactus(mCactusConfig)
         }
         return false
@@ -66,7 +69,7 @@ class CactusJobService : JobService() {
 
     override fun onStopJob(jobParameters: JobParameters): Boolean {
         log("onStopJob")
-        if (!isServiceRunning && !mIsStop && !isStopFlag()) {
+        if (!isCactusRunning && !mIsStop) {
             registerCactus(mCactusConfig)
         }
         return false
@@ -75,11 +78,16 @@ class CactusJobService : JobService() {
     /**
      * 开始Job
      */
-    private fun startJob() {
-        val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobScheduler.cancel(jobId)
+    private fun registerJob() {
+        mJobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        mJobId = getJobId()
+        if (mJobId != -1) {
+            mJobScheduler.cancel(mJobId)
+        }
+        mJobId = Process.myPid()
+        saveJobId(mJobId)
         val builder = JobInfo.Builder(
-            jobId,
+            mJobId,
             ComponentName(packageName, CactusJobService::class.java.name)
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -98,6 +106,6 @@ class CactusJobService : JobService() {
             setRequiresCharging(true) // 当插入充电器，执行该任务
             setPersisted(true)
         }
-        jobScheduler.schedule(builder.build())
+        mJobScheduler.schedule(builder.build())
     }
 }
