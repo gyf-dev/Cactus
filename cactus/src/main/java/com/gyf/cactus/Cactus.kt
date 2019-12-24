@@ -275,6 +275,26 @@ class Cactus private constructor() {
     }
 
     /**
+     * 是否可以使用WorkManager，默认可以使用，非必传
+     *
+     * @param enabled Boolean
+     * @return WaterBear
+     */
+    fun setWorkerEnabled(enabled: Boolean) = apply {
+        mDefaultConfig.workerEnabled = enabled
+    }
+
+    /**
+     * 奔溃是否可以重启，google原生rom android 10 以下可以正常重启，默认不可以，非必传
+     *
+     * @param enabled Boolean
+     * @return WaterBear
+     */
+    fun setCrashRestartEnabled(enabled: Boolean) = apply {
+        mDefaultConfig.crashRestartEnabled = enabled
+    }
+
+    /**
      * 是否Debug模式，默认没有调试信息，非必传
      *
      * @param isDebug Boolean

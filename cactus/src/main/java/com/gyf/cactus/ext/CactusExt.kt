@@ -56,6 +56,10 @@ internal val sMainHandler by lazy {
  */
 internal var sTimes = 0
 /**
+ * 启动次数，用以判断是否使用奔溃重启
+ */
+internal var sStartTimes = 0
+/**
  * 配置信息
  */
 internal var sCactusConfig: CactusConfig? = null
@@ -117,7 +121,9 @@ internal fun Context.register(cactusConfig: CactusConfig) {
             if (sRegistered && isCactusRunning) {
                 log("Cactus is running，Please stop Cactus before registering!!")
             } else {
+                sStartTimes++
                 sRegistered = true
+                handleRestartIntent(cactusConfig)
                 saveConfig(cactusConfig)
                 CactusUncaughtExceptionHandler.instance
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -146,7 +152,11 @@ internal fun Context.unregister() {
     try {
         if (isCactusRunning && sRegistered) {
             sRegistered = false
-            unregisterWorker()
+            sCactusConfig?.apply {
+                if (defaultConfig.workerEnabled) {
+                    unregisterWorker()
+                }
+            }
             sendBroadcast(Intent("${Constant.CACTUS_FLAG_STOP}.$packageName"))
             sMainHandler.postDelayed({
                 mAppBackgroundCallback?.also {
@@ -181,7 +191,13 @@ internal fun Context.registerCactus(cactusConfig: CactusConfig) {
     val intent = Intent(this, LocalService::class.java)
     intent.putExtra(Constant.CACTUS_CONFIG, cactusConfig)
     startInternService(intent)
-    sMainHandler.postDelayed({ registerWorker() }, 5000)
+    sMainHandler.postDelayed({
+        if (cactusConfig.defaultConfig.workerEnabled) {
+            registerWorker()
+        } else {
+            unregisterWorker()
+        }
+    }, 5000)
 }
 
 /**
@@ -305,6 +321,26 @@ internal fun Service.stopService() {
         } catch (e: Exception) {
         }
     }, 1000)
+}
+
+/**
+ * 设置重启Intent
+ *
+ * @receiver Context
+ * @param cactusConfig CactusConfig
+ */
+private fun Context.handleRestartIntent(cactusConfig: CactusConfig) {
+    cactusConfig.defaultConfig.apply {
+        if (crashRestartEnabled) {
+            restartIntent = packageManager.getLaunchIntentForPackage(packageName)
+            restartIntent?.apply {
+                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        } else {
+            restartIntent = null
+        }
+    }
 }
 
 /**

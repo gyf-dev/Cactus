@@ -28,7 +28,7 @@ class CactusWorker(val context: Context, workerParams: WorkerParameters) :
     override fun doWork(): Result {
         context.apply {
             val cactusConfig = getConfig()
-            log("${toString()}-doWork")
+            log("${this@CactusWorker}-doWork")
             if (!isCactusRunning && !mIsStop && !isStopped) {
                 register(cactusConfig)
             }

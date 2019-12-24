@@ -1,5 +1,6 @@
 package com.gyf.cactus.entity
 
+import android.content.Intent
 import android.os.Parcel
 import android.os.Parcelable
 import com.gyf.cactus.R
@@ -34,7 +35,19 @@ data class DefaultConfig(
     /**
      * 是否可以使用一像素
      */
-    var onePixEnabled: Boolean = true
+    var onePixEnabled: Boolean = true,
+    /**
+     * 是否可以使用WorkManager
+     */
+    var workerEnabled: Boolean = true,
+    /**
+     * 奔溃是否可以重启
+     */
+    var crashRestartEnabled: Boolean = false,
+    /**
+     * 重启Intent
+     */
+    var restartIntent: Intent? = null
 ) : Parcelable {
     constructor(source: Parcel) : this(
         1 == source.readInt(),
@@ -42,7 +55,10 @@ data class DefaultConfig(
         1 == source.readInt(),
         source.readLong(),
         source.readInt(),
-        1 == source.readInt()
+        1 == source.readInt(),
+        1 == source.readInt(),
+        1 == source.readInt(),
+        source.readParcelable<Intent>(Intent::class.java.classLoader)
     )
 
     override fun describeContents() = 0
@@ -54,6 +70,9 @@ data class DefaultConfig(
         writeLong(repeatInterval)
         writeInt(musicId)
         writeInt((if (onePixEnabled) 1 else 0))
+        writeInt((if (workerEnabled) 1 else 0))
+        writeInt((if (crashRestartEnabled) 1 else 0))
+        writeParcelable(restartIntent, 0)
     }
 
     companion object {

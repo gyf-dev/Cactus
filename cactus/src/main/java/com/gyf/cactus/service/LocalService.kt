@@ -1,5 +1,6 @@
 package com.gyf.cactus.service
 
+import android.app.PendingIntent
 import android.app.Service
 import android.content.*
 import android.media.MediaPlayer
@@ -232,6 +233,7 @@ class LocalService : Service(), IBinder.DeathRecipient {
                     times
                 )
             )
+            setCrashRestart(times)
             if (Constant.CALLBACKS.isNotEmpty()) {
                 Constant.CALLBACKS.forEach {
                     it.doWork(times)
@@ -276,6 +278,22 @@ class LocalService : Service(), IBinder.DeathRecipient {
             if (onePixEnabled) {
                 backBackground()
                 finishOnePix()
+            }
+        }
+    }
+
+    /**
+     * 设置奔溃重启，google原生rom android 10 以下可以正常重启
+     *
+     * @param times Int
+     */
+    private fun setCrashRestart(times: Int) {
+        if (times > 1 && sStartTimes == 1) {
+            mCactusConfig.defaultConfig.restartIntent?.also {
+                try {
+                    PendingIntent.getActivity(this, 0, it, 0).send()
+                } catch (e: Exception) {
+                }
             }
         }
     }
