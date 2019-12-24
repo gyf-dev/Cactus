@@ -285,12 +285,12 @@ class Cactus private constructor() {
     }
 
     /**
-     * 奔溃是否可以重启，默认为false，google原生rom android 10 以下可以正常重启，非必传
+     * 奔溃是否可以重启用户界面，默认为false，google原生rom android 10 以下可以正常重启，非必传
      *
      * @param enabled Boolean
      * @return WaterBear
      */
-    fun setCrashRestartEnabled(enabled: Boolean) = apply {
+    fun setCrashRestartUIEnabled(enabled: Boolean) = apply {
         mDefaultConfig.crashRestartEnabled = enabled
     }
 

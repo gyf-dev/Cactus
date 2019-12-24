@@ -67,7 +67,7 @@
   | ★ setSmallIcon | 通知栏小图标，默认是库里的图标，建议用户修改，非必传 | setLargeIcon  | 通知栏大图标，默认没有大图标，非必传 |
   | ★ setServiceId | 服务Id，默认是1到Int.MAX_VALUE随机数，非必传 | setPendingIntent | 设置PendingIntent，用来处理通知栏点击事件，非必传 |
   | addCallback | 增加回调，用于处理一些额外的工作，非必传 | addBackgroundCallback  | 前后台切换回调，用于处理app前后台切换，非必传 |
-  | setWorkerEnabled | 是否可以使用WorkManager，默认可以使用，非必传 | setCrashRestartEnabled  | 奔溃是否可以重启，默认为false，google原生rom android 10 以下可以正常重启，非必传 |
+  | setWorkerEnabled | 是否可以使用WorkManager，默认可以使用，非必传 | setCrashRestartUIEnabled  | 奔溃是否可以重启用户界面，默认为false，google原生rom android 10 以下可以正常重启，非必传 |
   | setRemoteViews | 设置RemoteViews（自定义布局），非必传 | setBigRemoteViews |设置BigRemoteViews（自定义布局），非必传 |
   | hideNotification | 是否隐藏通知栏，经测试，除了android 7.1手机之外都可以隐藏，默认隐藏，非必传 | hideNotificationAfterO |是否隐藏Android 8.0以上通知栏，默认隐藏 |
   | setMusicEnabled | 是否可以播放音乐，默认可以播放音乐，非必传 | setBackgroundMusicEnabled  | 后台是否可以播放音乐，默认不可以后台播放音乐，非必传 |

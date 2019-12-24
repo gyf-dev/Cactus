@@ -77,7 +77,7 @@ class App : Application(), CactusCallback {
             //可选，退到后台是否可以播放音乐
             setBackgroundMusicEnabled(true)
             //可选，设置奔溃可以重启，google原生rom android 10以下可以正常重启
-            setCrashRestartEnabled(true)
+            setCrashRestartUIEnabled(true)
             //可选，运行时回调
             addCallback(this@App)
             //可选，切后台切换回调
