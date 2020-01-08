@@ -80,10 +80,10 @@ class Cactus private constructor() {
     /**
      * 设置NotificationChannel，非必传，如果不传，将使用默认的NotificationChannel
      *
-     * @param notificationChannel NotificationChannel
+     * @param notificationChannel NotificationChannel?
      * @return Cactus
      */
-    fun setNotificationChannel(notificationChannel: NotificationChannel) = apply {
+    fun setNotificationChannel(notificationChannel: NotificationChannel?) = apply {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mNotificationConfig.notificationChannel = notificationChannel
         }

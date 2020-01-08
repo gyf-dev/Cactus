@@ -121,25 +121,23 @@ private fun Context.getNotification(notificationConfig: NotificationConfig): Not
                 .build()
         //设置渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            managerCompat.createNotificationChannel(
-                if (notificationChannel is NotificationChannel) {
-                    (notificationChannel as NotificationChannel?)?.apply {
-                        if (id != notification.channelId) {
-                            throw CactusException(
-                                "保证渠道相同(The id of the NotificationChannel " +
-                                        "is different from the channel of the Notification.)"
-                            )
-                        }
+            if (notificationChannel != null && notificationChannel is NotificationChannel) {
+                (notificationChannel as NotificationChannel).apply {
+                    if (id != notification.channelId) {
+                        throw CactusException(
+                            "保证渠道相同(The id of the NotificationChannel " +
+                                    "is different from the channel of the Notification.)"
+                        )
                     }
-                    notificationChannel as NotificationChannel?
-                } else {
-                    null
-                } ?: NotificationChannel(
+                }
+            } else {
+                notificationChannel = NotificationChannel(
                     notification.channelId,
                     notificationConfig.channelName,
                     NotificationManager.IMPORTANCE_NONE
                 )
-            )
+            }
+            managerCompat.createNotificationChannel(notificationChannel as NotificationChannel)
         }
         notification
     }
