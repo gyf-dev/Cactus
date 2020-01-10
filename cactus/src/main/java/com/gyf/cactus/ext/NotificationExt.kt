@@ -120,7 +120,9 @@ private fun Context.getNotification(notificationConfig: NotificationConfig): Not
                 }
                 .build()
         //设置渠道
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            managerCompat.getNotificationChannel(notification.channelId) == null
+        ) {
             if (notificationChannel != null && notificationChannel is NotificationChannel) {
                 (notificationChannel as NotificationChannel).apply {
                     if (id != notification.channelId) {
