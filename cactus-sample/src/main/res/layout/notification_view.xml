@@ -11,6 +11,7 @@
         android:src="@mipmap/ic_launcher" />
 
     <TextView
+        android:id="@+id/tvCustomize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="我是自定义view"

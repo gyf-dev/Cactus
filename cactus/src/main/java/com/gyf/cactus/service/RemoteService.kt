@@ -102,7 +102,10 @@ class RemoteService : Service(), IBinder.DeathRecipient {
     override fun onCreate() {
         super.onCreate()
         CactusUncaughtExceptionHandler.instance
-        mCactusConfig = getConfig()
+        try {
+            mCactusConfig = getConfig()
+        } catch (e: Exception) {
+        }
         sMainHandler.postDelayed({
             if (!mIsNotification) {
                 log("handleNotification")
