@@ -89,21 +89,24 @@ class CactusJobService : JobService() {
             mJobId,
             ComponentName(packageName, CactusJobService::class.java.name)
         ).apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS) //执行的最小延迟时间
-                setOverrideDeadline(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS)  //执行的最长延时时间
-                setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS)
-                setBackoffCriteria(
-                    JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS,
-                    JobInfo.BACKOFF_POLICY_LINEAR
-                )//线性重试方案
-            } else {
-                setPeriodic(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS)
-                setRequiresDeviceIdle(true)
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS) //执行的最小延迟时间
+                    setOverrideDeadline(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS)  //执行的最长延时时间
+                    setMinimumLatency(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS)
+                    setBackoffCriteria(
+                        JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS,
+                        JobInfo.BACKOFF_POLICY_LINEAR
+                    )//线性重试方案
+                } else {
+                    setPeriodic(JobInfo.DEFAULT_INITIAL_BACKOFF_MILLIS)
+                    setRequiresDeviceIdle(true)
+                }
+                setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                setRequiresCharging(true) // 当插入充电器，执行该任务
+                setPersisted(true)
+            } catch (e: Exception) {
             }
-            setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-            setRequiresCharging(true) // 当插入充电器，执行该任务
-            setPersisted(true)
         }
         mJobScheduler.schedule(builder.build())
     }
