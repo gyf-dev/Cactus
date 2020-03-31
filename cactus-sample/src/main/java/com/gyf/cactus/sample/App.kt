@@ -3,12 +3,12 @@ package com.gyf.cactus.sample
 import android.annotation.SuppressLint
 import android.app.Application
 import android.app.PendingIntent
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import com.gyf.cactus.Cactus
 import com.gyf.cactus.callback.CactusCallback
 import com.gyf.cactus.ext.cactus
@@ -28,20 +28,25 @@ class App : Application(), CactusCallback {
 
     companion object {
         const val TAG = "cactus-sample"
+
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
+
         /**
          * 结束时间
          */
         val mEndDate = MutableLiveData<String>()
+
         /**
          * 上次存活时间
          */
         val mLastTimer = MutableLiveData<String>()
+
         /**
          * 存活时间
          */
         val mTimer = MutableLiveData<String>()
+
         /**
          * 运行状态
          */

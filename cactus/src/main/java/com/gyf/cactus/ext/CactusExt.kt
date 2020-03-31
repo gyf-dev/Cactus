@@ -223,7 +223,7 @@ internal fun Context.registerWorker() {
             val workRequest =
                 PeriodicWorkRequest.Builder(CactusWorker::class.java, 15, TimeUnit.SECONDS)
                     .build()
-            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            WorkManager.getInstance().enqueueUniquePeriodicWork(
                 CactusWorker::class.java.name,
                 ExistingPeriodicWorkPolicy.REPLACE,
                 workRequest
@@ -242,7 +242,7 @@ internal fun Context.registerWorker() {
  * @return Operation
  */
 internal fun Context.unregisterWorker() =
-    WorkManager.getInstance(this).cancelUniqueWork(CactusWorker::class.java.name)
+    WorkManager.getInstance().cancelUniqueWork(CactusWorker::class.java.name)
 
 /**
  * 开启远程服务

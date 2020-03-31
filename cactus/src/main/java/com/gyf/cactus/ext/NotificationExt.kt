@@ -8,8 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
 import com.gyf.cactus.R
 import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.NotificationConfig
@@ -54,20 +54,21 @@ internal fun Service.setNotification(
     val hasNotification = mHasNotification[tag]
     if (hasNotification == null || !hasNotification) {
         mHasNotification[tag] = true
-        val managerCompat = NotificationManagerCompat.from(this)
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notification = getNotification(notificationConfig)
         notificationConfig.apply {
             //更新Notification
-            managerCompat.notify(serviceId, notification)
+            notificationManager.notify(serviceId, notification)
             //设置前台服务Notification
             startForeground(serviceId, notification)
             //隐藏Notification
             if (hideNotification) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (managerCompat.getNotificationChannel(notification.channelId) != null
+                    if (notificationManager.getNotificationChannel(notification.channelId) != null
                         && hideNotificationAfterO
                     ) {
-                        sMainHandler.post { managerCompat.deleteNotificationChannel(notification.channelId) }
+                        sMainHandler.post { notificationManager.deleteNotificationChannel(notification.channelId) }
                     }
                 } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
                     if (!isHideService) {
@@ -89,7 +90,8 @@ internal fun Service.setNotification(
  */
 private fun Context.getNotification(notificationConfig: NotificationConfig): Notification =
     notificationConfig.run {
-        val managerCompat = NotificationManagerCompat.from(this@getNotification)
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         //构建Notification
         val notification =
             notification ?: NotificationCompat.Builder(this@getNotification, channelId)
@@ -121,7 +123,7 @@ private fun Context.getNotification(notificationConfig: NotificationConfig): Not
                 .build()
         //设置渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-            managerCompat.getNotificationChannel(notification.channelId) == null
+            notificationManager.getNotificationChannel(notification.channelId) == null
         ) {
             if (notificationChannel != null && notificationChannel is NotificationChannel) {
                 (notificationChannel as NotificationChannel).apply {
@@ -139,7 +141,7 @@ private fun Context.getNotification(notificationConfig: NotificationConfig): Not
                     NotificationManager.IMPORTANCE_NONE
                 )
             }
-            managerCompat.createNotificationChannel(notificationChannel as NotificationChannel)
+            notificationManager.createNotificationChannel(notificationChannel as NotificationChannel)
         }
         notification
     }

@@ -1,11 +1,11 @@
 package com.gyf.cactus.sample
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import com.gyf.cactus.ext.cactusRestart
 import com.gyf.cactus.ext.cactusUnregister
 import kotlinx.android.synthetic.main.activity_main.*
@@ -36,17 +36,19 @@ class MainActivity : BaseActivity() {
         App.mEndDate.observe(this, Observer {
             tvLastDate.text = it
         })
-        App.mLastTimer.observe(this, Observer<String> {
+        App.mLastTimer.observe(this, Observer {
             tvLastTimer.text = it
         })
-        App.mTimer.observe(this, Observer<String> {
+        App.mTimer.observe(this, Observer {
             tvTimer.text = it
         })
         App.mStatus.observe(this, Observer {
-            tvStatus.text = if (it) {
-                "Operating status(运行状态):Running(运行中)"
-            } else {
-                "Operating status(运行状态):Stopped(已停止)"
+            it?.also {
+                tvStatus.text = if (it) {
+                    "Operating status(运行状态):Running(运行中)"
+                } else {
+                    "Operating status(运行状态):Stopped(已停止)"
+                }
             }
         })
     }
