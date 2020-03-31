@@ -5,9 +5,15 @@
 
 ## 使用 
 > android studio
+ - androidx
    ```groovy
    implementation 'com.gyf.cactus:cactus:1.1.3-beta09'
    ```
+- android support
+   ```groovy
+   implementation 'com.gyf.cactus:cactus-support:1.1.3-beta09'
+   ```
+
 ## 用法（具体api请参考api说明）
 #### java用法
 
