@@ -2,8 +2,8 @@
 
 ## 注意！注意！注意！写在前面
   如果你项目里使用了Thread.UncaughtExceptionHandler或者第三方异常捕获库，比如友盟，bugly等，Cactus请在Thread.UncaughtExceptionHandler或者第三方异常捕获库，比如友盟，bugly等之后注册使用，并且建议在Application里注册使用。
-  为什么要这样操作？因为如果android 8.0以上设备隐藏了通知栏信息，当您的app崩溃重启后会出现invalid channel for service notification异常，而该异常属于系统级别的，没法捕获，所以Cactus对该异常进行了杀死app的操作，但是并不能保证第三方异常监控还是能捕获它，
-  如果第三方后台还是有该异常信息，你觉得该异常影响你的app崩溃率，请调用hideNotificationAfterO(false)方法，打开通知栏信息。
+  为什么要这样操作？因为如果android 8.0以上设备隐藏了通知栏信息，当您的app崩溃重启后会出现invalid channel for service notification异常，而该异常属于系统级别的，没法捕获，所以Cactus对该异常进行了杀死app的操作，但是并不能保证第三方异常监控还是能捕获它。
+  如果第三方后台还是有该异常信息，你又觉得该异常影响你的app崩溃率，请调用hideNotificationAfterO(false)方法，打开通知栏信息。
 
 ## 使用 
 > android studio
