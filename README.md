@@ -7,11 +7,11 @@
 > android studio
  - androidx
    ```groovy
-   implementation 'com.gyf.cactus:cactus:1.1.3-beta09'
+   implementation 'com.gyf.cactus:cactus:1.1.3-beta10'
    ```
 - android support
    ```groovy
-   implementation 'com.gyf.cactus:cactus-support:1.1.3-beta09'
+   implementation 'com.gyf.cactus:cactus-support:1.1.3-beta10'
    ```
 
 ## 用法（具体api请参考api说明）
