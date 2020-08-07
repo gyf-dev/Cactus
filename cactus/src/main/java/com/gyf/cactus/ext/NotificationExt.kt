@@ -9,7 +9,6 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
 import com.gyf.cactus.R
 import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.NotificationConfig
@@ -20,11 +19,6 @@ import com.gyf.cactus.service.HideForegroundService
  * @author geyifeng
  * @date 2019-11-16 18:01
  */
-
-/**
- * 是否已经有Notification
- */
-private val mHasNotification = mutableMapOf<String, Boolean>()
 
 /**
  * 小图标
@@ -50,32 +44,31 @@ internal fun Service.setNotification(
     notificationConfig: NotificationConfig,
     isHideService: Boolean = false
 ) {
-    val tag = Constant.CACTUS_TAG + System.identityHashCode(this)
-    val hasNotification = mHasNotification[tag]
-    if (hasNotification == null || !hasNotification) {
-        mHasNotification[tag] = true
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = getNotification(notificationConfig)
-        notificationConfig.apply {
-            //更新Notification
-            notificationManager.notify(serviceId, notification)
-            //设置前台服务Notification
-            startForeground(serviceId, notification)
-            //隐藏Notification
-            if (hideNotification) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (notificationManager.getNotificationChannel(notification.channelId) != null
-                        && hideNotificationAfterO
-                    ) {
-                        sMainHandler.post { notificationManager.deleteNotificationChannel(notification.channelId) }
-                    }
-                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
-                    if (!isHideService) {
-                        val intent = Intent(this@setNotification, HideForegroundService::class.java)
-                        intent.putExtra(Constant.CACTUS_NOTIFICATION_CONFIG, this)
-                        startInternService(intent)
-                    }
+    val notificationManager =
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notification = getNotification(notificationConfig)
+    notificationConfig.apply {
+        //更新Notification
+        notificationManager.notify(serviceId, notification)
+        //设置前台服务Notification
+        startForeground(serviceId, notification)
+        //隐藏Notification
+        if (hideNotification) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (notificationManager.getNotificationChannel(notification.channelId) != null
+                    && hideNotificationAfterO
+                ) {
+                    sMainHandler.postDelayed(
+                        {
+                            notificationManager.deleteNotificationChannel(notification.channelId)
+                        }, 1000
+                    )
+                }
+            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+                if (!isHideService) {
+                    val intent = Intent(this@setNotification, HideForegroundService::class.java)
+                    intent.putExtra(Constant.CACTUS_NOTIFICATION_CONFIG, this)
+                    startInternService(intent)
                 }
             }
         }

@@ -29,10 +29,12 @@ class Cactus private constructor() {
      * 配置信息
      */
     private var mCactusConfig = CactusConfig()
+
     /**
      * 通知栏信息
      */
     private var mNotificationConfig = NotificationConfig()
+
     /**
      * 默认配置信息
      */
@@ -44,25 +46,30 @@ class Cactus private constructor() {
          */
         @JvmField
         val CACTUS_WORK = "work".fieldById
+
         /**
          * 停止时回调广播ACTION
          */
         @JvmField
         val CACTUS_STOP = "stop".fieldById
+
         /**
          * 后台回调广播ACTION
          */
         @JvmField
         val CACTUS_BACKGROUND = "background".fieldById
+
         /**
          * 前台后调广播ACTION
          */
         @JvmField
         val CACTUS_FOREGROUND = "foreground".fieldById
+
         /**
          * key，通过广播形式获取启动次数
          */
         const val CACTUS_TIMES = "times"
+
         @JvmStatic
         val instance by lazy { Cactus() }
     }
@@ -292,6 +299,16 @@ class Cactus private constructor() {
      */
     fun setCrashRestartUIEnabled(enabled: Boolean) = apply {
         mDefaultConfig.crashRestartEnabled = enabled
+    }
+
+    /**
+     * 设置回调工作在主线程，默认在Binder线程
+     *
+     * @param enabled Boolean
+     * @return Cactus
+     */
+    fun setWorkOnMainThread(enabled: Boolean) = apply {
+        mDefaultConfig.workOnMainThread = enabled
     }
 
     /**

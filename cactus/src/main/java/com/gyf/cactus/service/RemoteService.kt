@@ -10,7 +10,6 @@ import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.ICactusInterface
 import com.gyf.cactus.exception.CactusUncaughtExceptionHandler
 import com.gyf.cactus.ext.*
-import java.lang.ref.WeakReference
 
 /**
  * 远程服务
@@ -44,11 +43,6 @@ class RemoteService : Service(), IBinder.DeathRecipient {
      * 是否已经注册linkToDeath
      */
     private var mIsDeathBind = false
-
-    /**
-     * 是否已经显示通知栏
-     */
-    private var mIsNotification = false
 
     private lateinit var remoteBinder: RemoteBinder
 
@@ -103,17 +97,11 @@ class RemoteService : Service(), IBinder.DeathRecipient {
         super.onCreate()
         CactusUncaughtExceptionHandler.instance
         try {
+            log("handleNotification")
             mCactusConfig = getConfig()
+            setNotification(mCactusConfig.notificationConfig)
         } catch (e: Exception) {
         }
-        sMainHandler.postDelayed({
-            if (!mIsNotification) {
-                log("handleNotification")
-                WeakReference<Service>(this).get()
-                    ?.setNotification(mCactusConfig.notificationConfig)
-                mIsNotification = true
-            }
-        }, 4000)
         registerStopReceiver {
             mIsStop = true
             sTimes = mConnectionTimes
@@ -126,6 +114,7 @@ class RemoteService : Service(), IBinder.DeathRecipient {
             sCactusConfig = it
             mCactusConfig = it
         }
+        setNotification(mCactusConfig.notificationConfig)
         mIsBind = startLocalService(mServiceConnection, mCactusConfig, false)
         log("RemoteService is running")
         return START_STICKY
@@ -133,9 +122,7 @@ class RemoteService : Service(), IBinder.DeathRecipient {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (mIsNotification) {
-            stopForeground(true)
-        }
+        stopForeground(true)
         stopBind()
         log("RemoteService has stopped")
     }
@@ -149,10 +136,7 @@ class RemoteService : Service(), IBinder.DeathRecipient {
 
         override fun wakeup(config: CactusConfig) {
             mCactusConfig = config
-            if (!mIsNotification) {
-                setNotification(mCactusConfig.notificationConfig)
-                mIsNotification = true
-            }
+            setNotification(mCactusConfig.notificationConfig)
         }
 
         override fun connectionTimes(time: Int) {
