@@ -45,6 +45,10 @@ data class DefaultConfig(
      */
     var crashRestartEnabled: Boolean = false,
     /**
+     * 工作在主线程
+     */
+    var workOnMainThread: Boolean = false,
+    /**
      * 重启Intent
      */
     var restartIntent: Intent? = null
@@ -55,6 +59,7 @@ data class DefaultConfig(
         1 == source.readInt(),
         source.readLong(),
         source.readInt(),
+        1 == source.readInt(),
         1 == source.readInt(),
         1 == source.readInt(),
         1 == source.readInt(),
@@ -72,6 +77,7 @@ data class DefaultConfig(
         writeInt((if (onePixEnabled) 1 else 0))
         writeInt((if (workerEnabled) 1 else 0))
         writeInt((if (crashRestartEnabled) 1 else 0))
+        writeInt((if (workOnMainThread) 1 else 0))
         writeParcelable(restartIntent, 0)
     }
 

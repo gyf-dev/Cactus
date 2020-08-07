@@ -28,20 +28,25 @@ class App : Application(), CactusCallback {
 
     companion object {
         const val TAG = "cactus-sample"
+
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
+
         /**
          * 结束时间
          */
         val mEndDate = MutableLiveData<String>()
+
         /**
          * 上次存活时间
          */
         val mLastTimer = MutableLiveData<String>()
+
         /**
          * 存活时间
          */
         val mTimer = MutableLiveData<String>()
+
         /**
          * 运行状态
          */

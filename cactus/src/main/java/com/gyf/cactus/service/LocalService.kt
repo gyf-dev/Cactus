@@ -23,6 +23,7 @@ class LocalService : Service(), IBinder.DeathRecipient {
      * 配置信息
      */
     private lateinit var mCactusConfig: CactusConfig
+
     /**
      * 音乐播放器
      */
@@ -236,7 +237,11 @@ class LocalService : Service(), IBinder.DeathRecipient {
             setCrashRestart(times)
             if (Constant.CALLBACKS.isNotEmpty()) {
                 Constant.CALLBACKS.forEach {
-                    it.doWork(times)
+                    if (mCactusConfig.defaultConfig.workOnMainThread) {
+                        sMainHandler.post { it.doWork(times) }
+                    } else {
+                        it.doWork(times)
+                    }
                 }
             }
         }
