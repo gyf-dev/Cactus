@@ -5,11 +5,13 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.os.Process
 import com.gyf.cactus.entity.CactusConfig
 import com.gyf.cactus.entity.Constant
 import com.gyf.cactus.entity.ICactusInterface
 import com.gyf.cactus.exception.CactusUncaughtExceptionHandler
 import com.gyf.cactus.ext.*
+import kotlin.system.exitProcess
 
 /**
  * 远程服务
@@ -125,6 +127,8 @@ class RemoteService : Service(), IBinder.DeathRecipient {
         stopForeground(true)
         stopBind()
         log("RemoteService has stopped")
+        Process.killProcess(Process.myPid())
+        exitProcess(10)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
