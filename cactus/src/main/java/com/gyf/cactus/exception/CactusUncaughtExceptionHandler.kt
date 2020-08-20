@@ -27,10 +27,10 @@ internal class CactusUncaughtExceptionHandler private constructor() :
 
     override fun uncaughtException(t: Thread, e: Throwable) {
         val message = e.message
-        if (message != null && message.contains(
+        if (message != null && (message.contains(
                 "Bad notification for startForeground: " +
                         "java.lang.RuntimeException: invalid channel for service notification"
-            )
+            ) || message.contains("Context.startForegroundService() did not then call Service.startForeground()"))
         ) {
             Process.killProcess(Process.myPid())
             exitProcess(10)
