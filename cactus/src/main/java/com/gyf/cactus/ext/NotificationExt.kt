@@ -81,7 +81,7 @@ internal fun Service.setNotification(
  * @param notificationConfig NotificationConfig
  * @return Notification
  */
-private fun Context.getNotification(notificationConfig: NotificationConfig): Notification =
+internal fun Context.getNotification(notificationConfig: NotificationConfig): Notification =
     notificationConfig.run {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

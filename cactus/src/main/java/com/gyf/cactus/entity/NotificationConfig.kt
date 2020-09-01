@@ -79,6 +79,25 @@ data class NotificationConfig(
     @Transient
     var notificationChannel: Parcelable? = null
 ) : Parcelable {
+
+    /**
+     * 是否可以更新
+     *
+     * @param notificationConfig NotificationConfig
+     */
+    fun canUpdate(notificationConfig: NotificationConfig): Boolean {
+        val can = serviceId == notificationConfig.serviceId &&
+                channelId == notificationConfig.channelId &&
+                channelName == notificationConfig.channelName &&
+                hideNotification == notificationConfig.hideNotification &&
+                hideNotificationAfterO == notificationConfig.hideNotificationAfterO &&
+                !hideNotification && !hideNotificationAfterO
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            can && notificationChannel == notificationConfig.notificationChannel &&
+                    notification?.channelId == notificationConfig.notification?.channelId
+        } else can
+    }
+
     constructor(source: Parcel) : this(
         source.readInt(),
         source.readString() ?: "Cactus",

@@ -40,6 +40,11 @@ class Cactus private constructor() {
      */
     private val mDefaultConfig = DefaultConfig()
 
+    /**
+     * 是否使用上一次保存的配置信息
+     */
+    private var mUsePreviousConfig = false
+
     companion object {
         /**
          * 运行时回调广播ACTION
@@ -312,6 +317,16 @@ class Cactus private constructor() {
     }
 
     /**
+     * 是否使用上一次保存的配置信息
+     *
+     * @param usePreviousConfig Boolean
+     * @return Cactus
+     */
+    fun usePreviousConfig(usePreviousConfig: Boolean) = apply {
+        mUsePreviousConfig = usePreviousConfig
+    }
+
+    /**
      * 是否Debug模式，默认没有调试信息，非必传
      *
      * @param isDebug Boolean
@@ -382,10 +397,15 @@ class Cactus private constructor() {
      * @param context Context
      */
     fun register(context: Context) {
-        mCactusConfig = CactusConfig(
+        val cactusConfig = CactusConfig(
             mNotificationConfig,
             mDefaultConfig
         )
+        mCactusConfig = if (mUsePreviousConfig) {
+            context.getPreviousConfig() ?: cactusConfig
+        } else {
+            cactusConfig
+        }
         context.register(mCactusConfig)
     }
 
@@ -402,6 +422,16 @@ class Cactus private constructor() {
      * @param context Context
      */
     fun restart(context: Context) = context.restart()
+
+    /**
+     * 更新通知栏
+     *
+     * @param context Context
+     */
+    fun updateNotification(context: Context) {
+        mCactusConfig.notificationConfig = mNotificationConfig
+        context.updateNotification(mCactusConfig)
+    }
 
     /**
      * 是否在运行

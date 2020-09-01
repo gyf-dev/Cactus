@@ -1,9 +1,6 @@
 package com.gyf.cactus.ext
 
-import android.app.Activity
-import android.app.Application
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
@@ -37,32 +34,39 @@ import java.util.concurrent.TimeUnit
  * 用以保存一像素Activity
  */
 private var mWeakReference: WeakReference<Activity>? = null
+
 /**
  * 用来表示是前台还是后台
  */
 private var mIsForeground = false
+
 /**
  * 是否注册过
  */
 private var sRegistered = false
+
 /**
  * 主Handler
  */
 internal val sMainHandler by lazy {
     Handler(Looper.getMainLooper())
 }
+
 /**
  * 启动次数
  */
 internal var sTimes = 0
+
 /**
  * 启动次数，用以判断是否使用奔溃重启
  */
 internal var sStartTimes = 0
+
 /**
  * 配置信息
  */
 internal var sCactusConfig: CactusConfig? = null
+
 /**
  * 前后台切换监听
  */
@@ -90,6 +94,15 @@ fun Context.cactusUnregister() = Cactus.instance.unregister(this)
  * @receiver Context
  */
 fun Context.cactusRestart() = Cactus.instance.restart(this)
+
+/**
+ * 更新通知栏
+ *
+ * @receiver Context
+ * @param block [@kotlin.ExtensionFunctionType] Function1<Cactus, Unit>
+ */
+fun Context.cactusUpdateNotification(block: Cactus.() -> Unit) =
+    Cactus.instance.apply { block() }.updateNotification(this)
 
 /**
  * 是否已经停止
@@ -180,6 +193,23 @@ internal fun Context.unregister() {
  * @receiver Context
  */
 internal fun Context.restart() = register(getConfig())
+
+/**
+ * 更新通知栏
+ *
+ * @receiver Context
+ * @param cactusConfig CactusConfig
+ */
+internal fun Context.updateNotification(cactusConfig: CactusConfig) {
+    if (!getConfig().notificationConfig.canUpdate(cactusConfig.notificationConfig)) {
+        return
+    }
+    saveConfig(cactusConfig)
+    val notificationManager =
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notification = getNotification(cactusConfig.notificationConfig)
+    notificationManager.notify(cactusConfig.notificationConfig.serviceId, notification)
+}
 
 /**
  * 最终都将调用此方法，注册Cactus服务

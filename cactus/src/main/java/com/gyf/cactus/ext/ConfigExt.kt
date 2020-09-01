@@ -38,12 +38,20 @@ internal fun Context.saveConfig(cactusConfig: CactusConfig) {
  * @receiver Context
  * @return CactusConfig
  */
-internal fun Context.getConfig() = sCactusConfig ?: getSharedPreferences(
+internal fun Context.getConfig() = sCactusConfig ?: getPreviousConfig() ?: CactusConfig()
+
+/**
+ * 获取Sp保存的配置信息
+ *
+ * @receiver Context
+ * @return CactusConfig?
+ */
+internal fun Context.getPreviousConfig() = getSharedPreferences(
     Constant.CACTUS_TAG,
     Context.MODE_PRIVATE
 ).getString(Constant.CACTUS_CONFIG, null)?.run {
     Gson().fromJson(this, CactusConfig::class.java)
-} ?: CactusConfig()
+}
 
 /**
  * 保存JobId
