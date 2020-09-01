@@ -50,11 +50,11 @@ data class NotificationConfig(
     /**
      * 是否隐藏 Android O以上通知栏
      */
-    var hideNotificationAfterO: Boolean = true,
+    var hideNotificationAfterO: Boolean = false,
     /**
      * 是否隐藏通知栏，对于 Android O以下有效
      */
-    var hideNotification: Boolean = true,
+    var hideNotification: Boolean = false,
     /**
      * 自定义布局
      */
@@ -79,6 +79,25 @@ data class NotificationConfig(
     @Transient
     var notificationChannel: Parcelable? = null
 ) : Parcelable {
+
+    /**
+     * 是否可以更新
+     *
+     * @param notificationConfig NotificationConfig
+     */
+    fun canUpdate(notificationConfig: NotificationConfig): Boolean {
+        val can = serviceId == notificationConfig.serviceId &&
+                channelId == notificationConfig.channelId &&
+                channelName == notificationConfig.channelName &&
+                hideNotification == notificationConfig.hideNotification &&
+                hideNotificationAfterO == notificationConfig.hideNotificationAfterO &&
+                !hideNotification && !hideNotificationAfterO
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            can && notificationChannel == notificationConfig.notificationChannel &&
+                    notification?.channelId == notificationConfig.notification?.channelId
+        } else can
+    }
+
     constructor(source: Parcel) : this(
         source.readInt(),
         source.readString() ?: "Cactus",

@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.gyf.cactus.ext.cactusRestart
 import com.gyf.cactus.ext.cactusUnregister
+import com.gyf.cactus.ext.cactusUpdateNotification
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -19,6 +20,18 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : BaseActivity() {
 
     private var times = 0L
+
+    private val list = listOf(
+        Pair("今日头条", "抖音全世界通用"),
+        Pair("微博", "赵丽颖吐槽中餐厅"),
+        Pair("绿洲", "今天又是美好的一天"),
+        Pair("QQ", "好友申请"),
+        Pair("微信", "在吗？"),
+        Pair("百度地图", "新的路径规划"),
+        Pair("墨迹天气", "明日大风，注意出行"),
+        Pair("信息", "1条文本信息"),
+        Pair("手机天猫", "你关注的宝贝降价啦")
+    )
 
     companion object {
         private const val TIME = 4000L
@@ -52,6 +65,14 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setListener() {
+        //更新通知栏信息
+        btnUpdate.onClick {
+            val num = (0..8).random()
+            cactusUpdateNotification {
+                setTitle(list[num].first)
+                setContent(list[num].second)
+            }
+        }
         //停止
         btnStop.onClick {
             cactusUnregister()

@@ -105,6 +105,14 @@
             tools:ignore="HardcodedText" />
 
         <Button
+            android:id="@+id/btnUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/update"
+            android:textAllCaps="false" />
+
+        <Button
             android:id="@+id/btnStop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

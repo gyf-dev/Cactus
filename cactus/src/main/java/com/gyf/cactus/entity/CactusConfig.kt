@@ -13,7 +13,7 @@ data class CactusConfig(
     /**
      * 通知栏信息
      */
-    val notificationConfig: NotificationConfig = NotificationConfig(),
+    var notificationConfig: NotificationConfig = NotificationConfig(),
     /**
      * 默认配置信息
      */
