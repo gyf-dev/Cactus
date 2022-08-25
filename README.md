@@ -41,6 +41,7 @@
 
 - 注册 
    ```kotlin
+    //fun Context.cactus()
     cactus {
        setPendingIntent(pendingIntent)
        setMusicId(R.raw.main)
